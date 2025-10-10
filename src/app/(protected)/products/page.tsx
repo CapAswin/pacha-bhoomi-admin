@@ -4,6 +4,13 @@ import React from 'react';
 import { Bot, PlusCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import {
   Dialog,
   DialogContent,
   DialogDescription,
