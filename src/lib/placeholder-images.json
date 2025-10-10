@@ -11,6 +11,36 @@
       "description": "User Avatar 2",
       "imageUrl": "https://picsum.photos/seed/2/40/40",
       "imageHint": "person face"
+    },
+    {
+      "id": "product-image-1",
+      "description": "Product Image 1",
+      "imageUrl": "https://picsum.photos/seed/101/600/400",
+      "imageHint": "product"
+    },
+    {
+      "id": "product-image-2",
+      "description": "Product Image 2",
+      "imageUrl": "https://picsum.photos/seed/102/600/400",
+      "imageHint": "product detail"
+    },
+    {
+      "id": "product-image-3",
+      "description": "Product Image 3",
+      "imageUrl": "https://picsum.photos/seed/103/600/400",
+      "imageHint": "product lifestyle"
+    },
+    {
+      "id": "product-image-4",
+      "description": "Product Image 4",
+      "imageUrl": "https://picsum.photos/seed/104/600/400",
+      "imageHint": "product packaging"
+    },
+    {
+      "id": "product-image-5",
+      "description": "Product Image 5",
+      "imageUrl": "https://picsum.photos/seed/105/600/400",
+      "imageHint": "product context"
     }
   ]
 }

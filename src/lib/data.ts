@@ -1,4 +1,11 @@
 import type { Product, Order, Customer, Promotion } from '@/lib/types';
+import { PlaceHolderImages } from '@/lib/placeholder-images';
+
+const pImage1 = PlaceHolderImages.find(img => img.id === 'product-image-1')?.imageUrl || '/placeholder.svg';
+const pImage2 = PlaceHolderImages.find(img => img.id === 'product-image-2')?.imageUrl || '/placeholder.svg';
+const pImage3 = PlaceHolderImages.find(img => img.id === 'product-image-3')?.imageUrl || '/placeholder.svg';
+const pImage4 = PlaceHolderImages.find(img => img.id === 'product-image-4')?.imageUrl || '/placeholder.svg';
+const pImage5 = PlaceHolderImages.find(img => img.id === 'product-image-5')?.imageUrl || '/placeholder.svg';
 
 export const products: Product[] = [
   {
@@ -8,7 +15,7 @@ export const products: Product[] = [
     stock: 150,
     status: 'in stock',
     description: 'High-quality organic turmeric powder, sourced sustainably.',
-    images: ['/placeholder.svg'],
+    images: [pImage1, pImage2, pImage3],
   },
   {
     id: 'PROD-002',
@@ -17,7 +24,7 @@ export const products: Product[] = [
     stock: 30,
     status: 'low stock',
     description: 'A variety of heirloom tomato seeds for your garden.',
-    images: ['/placeholder.svg'],
+    images: [pImage4, pImage5],
   },
   {
     id: 'PROD-003',
@@ -26,7 +33,7 @@ export const products: Product[] = [
     stock: 50,
     status: 'in stock',
     description: 'Beautifully handcrafted clay pot for plants.',
-    images: ['/placeholder.svg'],
+    images: [pImage1],
   },
   {
     id: 'PROD-004',
@@ -35,7 +42,7 @@ export const products: Product[] = [
     stock: 0,
     status: 'out of stock',
     description: '20L bag of nutrient-rich soil mix for all types of plants.',
-    images: ['/placeholder.svg'],
+    images: [pImage2],
   },
   {
     id: 'PROD-005',
@@ -44,7 +51,7 @@ export const products: Product[] = [
     stock: 75,
     status: 'in stock',
     description: 'Eco-friendly pest repellent made from natural ingredients.',
-    images: ['/placeholder.svg'],
+    images: [pImage3],
   },
   {
     id: 'PROD-006',
@@ -53,7 +60,7 @@ export const products: Product[] = [
     stock: 80,
     status: 'in stock',
     description: '100% pure lavender essential oil for aromatherapy.',
-    images: ['/placeholder.svg'],
+    images: [pImage4, pImage5, pImage1],
   },
   {
     id: 'PROD-007',
@@ -62,7 +69,7 @@ export const products: Product[] = [
     stock: 40,
     status: 'in stock',
     description: 'Soothing bamboo wind chimes for your patio or garden.',
-    images: ['/placeholder.svg'],
+    images: [pImage2],
   },
 ];
 
