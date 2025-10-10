@@ -1,3 +1,4 @@
+
 'use client';
 
 import { PlusCircle } from 'lucide-react';
@@ -47,10 +48,10 @@ export default function PromotionsPage() {
   return (
     <>
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-headline font-bold">Promotions</h1>
+        <h1 className="text-3xl font-headline font-bold animate-slide-in-up">Promotions</h1>
         <Dialog>
           <DialogTrigger asChild>
-            <Button size="sm" className="gap-1">
+            <Button size="sm" className="gap-1 animate-slide-in-up" style={{ animationDelay: '100ms' }}>
               <PlusCircle className="h-3.5 w-3.5" />
               <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
                 Create Promotion
@@ -145,7 +146,7 @@ export default function PromotionsPage() {
           </DialogContent>
         </Dialog>
       </div>
-      <Card>
+      <Card className="animate-slide-in-up" style={{ animationDelay: '200ms' }}>
         <CardHeader>
           <CardTitle className="font-headline">
             Promotions & Discounts

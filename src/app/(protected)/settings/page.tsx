@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -15,9 +16,9 @@ import { Separator } from "@/components/ui/separator"
 export default function SettingsPage() {
   return (
     <>
-      <h1 className="text-3xl font-headline font-bold">Settings</h1>
+      <h1 className="text-3xl font-headline font-bold animate-slide-in-up">Settings</h1>
       <div className="grid gap-6">
-        <Card>
+        <Card className="animate-slide-in-up" style={{ animationDelay: '200ms' }}>
           <CardHeader>
             <CardTitle className="font-headline">Profile</CardTitle>
             <CardDescription>
@@ -41,7 +42,7 @@ export default function SettingsPage() {
           </CardFooter>
         </Card>
         
-        <Card>
+        <Card className="animate-slide-in-up" style={{ animationDelay: '300ms' }}>
           <CardHeader>
             <CardTitle className="font-headline">Appearance</CardTitle>
             <CardDescription>

@@ -1,3 +1,4 @@
+
 import {
   Card,
   CardContent,
@@ -13,9 +14,9 @@ export default function OrdersPage() {
   return (
     <>
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-headline font-bold">Orders</h1>
+        <h1 className="text-3xl font-headline font-bold animate-slide-in-up">Orders</h1>
       </div>
-      <Card>
+      <Card className="animate-slide-in-up" style={{ animationDelay: '200ms' }}>
         <CardHeader>
           <CardTitle className="font-headline">Order History</CardTitle>
           <CardDescription>
