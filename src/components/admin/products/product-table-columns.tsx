@@ -1,3 +1,4 @@
+
 "use client";
 
 import type { ColumnDef } from '@tanstack/react-table';
@@ -14,6 +15,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import type { Product } from '@/lib/types';
 import { DataTableColumnHeader } from '@/components/data-table/data-table-columns-header';
+import Image from 'next/image';
 
 export const columns: ColumnDef<Product>[] = [
   {
@@ -41,6 +43,23 @@ export const columns: ColumnDef<Product>[] = [
   {
     accessorKey: 'name',
     header: ({ column }) => <DataTableColumnHeader column={column} title="Product" />,
+    cell: ({ row }) => {
+        const product = row.original;
+        return (
+          <div className="flex items-center gap-3">
+            {product.images && product.images.length > 0 && (
+              <Image
+                src={product.images[0]}
+                alt={product.name}
+                width={40}
+                height={40}
+                className="rounded-full object-cover"
+              />
+            )}
+            <span>{product.name}</span>
+          </div>
+        );
+      },
   },
   {
     accessorKey: 'status',
