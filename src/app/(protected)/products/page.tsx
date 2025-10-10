@@ -32,6 +32,8 @@ import {
   type GenerateProductDescriptionInput,
 } from '@/ai/ai-product-description';
 import { useToast } from '@/hooks/use-toast';
+import type { Product } from '@/lib/types';
+import { ProductTableSkeleton } from '@/components/admin/products/product-table-skeleton';
 
 export default function ProductsPage() {
   const { toast } = useToast();
@@ -39,6 +41,17 @@ export default function ProductsPage() {
     'High-quality organic turmeric powder, sourced sustainably.'
   );
   const [isGenerating, setIsGenerating] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(true);
+  const [productList, setProductList] = React.useState<Product[]>([]);
+
+  React.useEffect(() => {
+    // Simulate fetching data
+    const timer = setTimeout(() => {
+      setProductList(products);
+      setIsLoading(false);
+    }, 1500); // 1.5 second delay
+    return () => clearTimeout(timer);
+  }, []);
 
   async function handleGenerateDescription() {
     setIsGenerating(true);
@@ -172,7 +185,11 @@ export default function ProductsPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <ProductTable columns={columns} data={products} />
+          {isLoading ? (
+            <ProductTableSkeleton />
+          ) : (
+            <ProductTable columns={columns} data={productList} />
+          )}
         </CardContent>
       </Card>
     </>
