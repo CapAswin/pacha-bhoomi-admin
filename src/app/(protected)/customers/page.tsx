@@ -10,32 +10,18 @@ import {
 import { CustomerTable } from '@/components/admin/customers/customer-table';
 import { columns } from '@/components/admin/customers/customer-table-columns';
 import { customers } from '@/lib/data';
-import { useAuth } from '@/firebase';
-import { sendPasswordResetEmail } from 'firebase/auth';
 import { useToast } from '@/hooks/use-toast';
 
 export default function CustomersPage() {
-  const auth = useAuth();
   const { toast } = useToast();
 
   const handleResetPassword = async (email: string) => {
-    if (!auth) return;
-    try {
-      await sendPasswordResetEmail(auth, email);
-      toast({
-        title: 'Password Reset Email Sent',
-        description: `An email has been sent to ${email} to reset their password.`,
-      });
-    } catch (error: any) {
-      console.error('Failed to send password reset email:', error);
-      toast({
-        variant: 'destructive',
-        title: 'Operation Failed',
-        description:
-          error.message ||
-          'Could not send password reset email. Please try again.',
-      });
-    }
+    // This functionality is removed as login is removed.
+    // We can show a toast message indicating the action is no longer available.
+    toast({
+      title: 'Action Not Available',
+      description: `Password management has been disabled.`,
+    });
   };
 
   return (

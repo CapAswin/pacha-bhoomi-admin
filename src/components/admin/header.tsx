@@ -4,7 +4,6 @@
 import Image from 'next/image';
 import { Search } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useAuth, useUser } from '@/firebase';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import {
   DropdownMenu,
@@ -21,13 +20,12 @@ import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 export function Header() {
   const userAvatar = PlaceHolderImages.find((img) => img.id === 'user-avatar-1');
-  const { user } = useUser();
-  const auth = useAuth();
   const router = useRouter();
 
-  const handleLogout = async () => {
-    await auth.signOut();
-    router.push('/login');
+  const handleLogout = () => {
+    // Since we are removing login, this can just redirect to a conceptual "logged out" state.
+    // For now, we'll just go to the main page which redirects to dashboard.
+    router.push('/');
   };
 
   return (
@@ -64,7 +62,7 @@ export function Header() {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>
-            {user ? user.email : 'My Account'}
+            My Account
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem>Settings</DropdownMenuItem>
