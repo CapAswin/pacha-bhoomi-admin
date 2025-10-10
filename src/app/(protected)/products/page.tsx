@@ -1,12 +1,8 @@
+'use client';
+
+import React from 'react';
 import { Bot, PlusCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
 import {
   Dialog,
   DialogContent,
@@ -23,8 +19,48 @@ import { ProductTable } from '@/components/admin/products/product-table';
 import { columns } from '@/components/admin/products/product-table-columns';
 import { products } from '@/lib/data';
 import { Separator } from '@/components/ui/separator';
+import {
+  generateProductDescription,
+  type GenerateProductDescriptionInput,
+} from '@/ai/ai-product-description';
+import { useToast } from '@/hooks/use-toast';
 
 export default function ProductsPage() {
+  const { toast } = useToast();
+  const [description, setDescription] = React.useState(
+    'High-quality organic turmeric powder, sourced sustainably.'
+  );
+  const [isGenerating, setIsGenerating] = React.useState(false);
+
+  async function handleGenerateDescription() {
+    setIsGenerating(true);
+    try {
+      const input: GenerateProductDescriptionInput = {
+        attributes: 'organic, non-gmo, sustainably-sourced',
+        keywords: 'turmeric, spice, health, antioxidant',
+        style: 'Informative and appealing',
+      };
+      const result = await generateProductDescription(input);
+      if (result.description) {
+        setDescription(result.description);
+        toast({
+          title: 'Description Generated',
+          description: 'The AI-powered description has been generated.',
+        });
+      }
+    } catch (error) {
+      console.error('Failed to generate description:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Generation Failed',
+        description:
+          'Could not generate a new description. Please try again.',
+      });
+    } finally {
+      setIsGenerating(false);
+    }
+  }
+
   return (
     <>
       <div className="flex items-center justify-between">
@@ -38,7 +74,7 @@ export default function ProductsPage() {
               </span>
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[600px]">
+          <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Add New Product</DialogTitle>
               <DialogDescription>
@@ -63,12 +99,15 @@ export default function ProductsPage() {
                 <div className="col-span-3 relative">
                   <Textarea
                     id="description"
-                    defaultValue="High-quality organic turmeric powder, sourced sustainably."
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
                   />
                   <Button
                     variant="ghost"
                     size="icon"
                     className="absolute bottom-2 right-2 h-7 w-7 text-accent"
+                    onClick={handleGenerateDescription}
+                    disabled={isGenerating}
                   >
                     <Bot className="h-4 w-4" />
                     <span className="sr-only">Generate with AI</span>
