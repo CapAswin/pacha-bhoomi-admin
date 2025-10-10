@@ -1,0 +1,173 @@
+import type { Product, Order, Customer, Promotion } from '@/lib/types';
+
+export const products: Product[] = [
+  {
+    id: 'PROD-001',
+    name: 'Organic Turmeric Powder',
+    price: 12.99,
+    stock: 150,
+    status: 'in stock',
+    description: 'High-quality organic turmeric powder, sourced sustainably.',
+    images: ['/placeholder.svg'],
+  },
+  {
+    id: 'PROD-002',
+    name: 'Heirloom Tomato Seeds',
+    price: 4.99,
+    stock: 30,
+    status: 'low stock',
+    description: 'A variety of heirloom tomato seeds for your garden.',
+    images: ['/placeholder.svg'],
+  },
+  {
+    id: 'PROD-003',
+    name: 'Handmade Clay Pot',
+    price: 25.0,
+    stock: 50,
+    status: 'in stock',
+    description: 'Beautifully handcrafted clay pot for plants.',
+    images: ['/placeholder.svg'],
+  },
+  {
+    id: 'PROD-004',
+    name: 'Compost-Rich Soil Mix',
+    price: 19.99,
+    stock: 0,
+    status: 'out of stock',
+    description: '20L bag of nutrient-rich soil mix for all types of plants.',
+    images: ['/placeholder.svg'],
+  },
+  {
+    id: 'PROD-005',
+    name: 'Natural Pest Repellent',
+    price: 15.5,
+    stock: 75,
+    status: 'in stock',
+    description: 'Eco-friendly pest repellent made from natural ingredients.',
+    images: ['/placeholder.svg'],
+  },
+  {
+    id: 'PROD-006',
+    name: 'Lavender Essential Oil',
+    price: 22.0,
+    stock: 80,
+    status: 'in stock',
+    description: '100% pure lavender essential oil for aromatherapy.',
+    images: ['/placeholder.svg'],
+  },
+  {
+    id: 'PROD-007',
+    name: 'Bamboo Wind Chimes',
+    price: 35.0,
+    stock: 40,
+    status: 'in stock',
+    description: 'Soothing bamboo wind chimes for your patio or garden.',
+    images: ['/placeholder.svg'],
+  },
+];
+
+export const orders: Order[] = [
+  {
+    id: 'ORD-001',
+    customer: { name: 'Alice Johnson', email: 'alice@example.com' },
+    date: '2023-10-26',
+    status: 'Delivered',
+    total: 49.98,
+  },
+  {
+    id: 'ORD-002',
+    customer: { name: 'Bob Smith', email: 'bob@example.com' },
+    date: '2023-10-25',
+    status: 'Shipped',
+    total: 19.99,
+  },
+  {
+    id: 'ORD-003',
+    customer: { name: 'Charlie Brown', email: 'charlie@example.com' },
+    date: '2023-10-25',
+    status: 'Processing',
+    total: 15.5,
+  },
+  {
+    id: 'ORD-004',
+    customer: { name: 'Diana Prince', email: 'diana@example.com' },
+    date: '2023-10-24',
+    status: 'Delivered',
+    total: 105.0,
+  },
+  {
+    id: 'ORD-005',
+    customer: { name: 'Ethan Hunt', email: 'ethan@example.com' },
+    date: '2023-10-23',
+    status: 'Cancelled',
+    total: 25.0,
+  },
+];
+
+export const customers: Customer[] = [
+  {
+    id: 'CUST-001',
+    name: 'Alice Johnson',
+    email: 'alice@example.com',
+    totalSpent: 1250.75,
+    orders: 12,
+  },
+  {
+    id: 'CUST-002',
+    name: 'Bob Smith',
+    email: 'bob@example.com',
+    totalSpent: 850.5,
+    orders: 8,
+  },
+  {
+    id: 'CUST-003',
+    name: 'Charlie Brown',
+    email: 'charlie@example.com',
+    totalSpent: 230.0,
+    orders: 3,
+  },
+  {
+    id: 'CUST-004',
+    name: 'Diana Prince',
+    email: 'diana@example.com',
+    totalSpent: 2400.0,
+    orders: 25,
+  },
+  {
+    id: 'CUST-005',
+    name: 'Ethan Hunt',
+    email: 'ethan@example.com',
+    totalSpent: 45.5,
+    orders: 1,
+  },
+];
+
+export const promotions: Promotion[] = [
+  {
+    id: 'PROMO-001',
+    code: 'FALL20',
+    type: 'Percentage',
+    value: '20%',
+    status: 'Active',
+    startDate: '2023-09-01',
+    endDate: '2023-11-30',
+  },
+  {
+    id: 'PROMO-002',
+    code: 'FREESHIP',
+    type: 'Free Shipping',
+    value: 'N/A',
+    status: 'Active',
+    startDate: '2023-01-01',
+    endDate: '2023-12-31',
+  },
+  {
+    id: 'PROMO-003',
+    code: 'SUMMER10',
+    type: 'Fixed Amount',
+    value: '$10',
+    status: 'Expired',
+    startDate: '2023-06-01',
+    endDate: '2023-08-31',
+  },
+];
