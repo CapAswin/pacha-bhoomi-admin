@@ -8,7 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { ChartTooltipContent } from '@/components/ui/chart';
+import { ChartTooltipContent, ChartContainer } from '@/components/ui/chart';
 
 const data = [
   { name: 'Jan', total: Math.floor(Math.random() * 5000) + 1000 },
@@ -25,6 +25,13 @@ const data = [
   { name: 'Dec', total: Math.floor(Math.random() * 5000) + 1000 },
 ];
 
+const chartConfig = {
+  total: {
+    label: "Total",
+    color: "hsl(var(--chart-1))",
+  },
+};
+
 export function SalesChart() {
   return (
     <Card>
@@ -35,33 +42,33 @@ export function SalesChart() {
         </CardDescription>
       </CardHeader>
       <CardContent className="pl-2">
-        <ResponsiveContainer width="100%" height={350}>
-          <BarChart data={data}>
-            <XAxis
-              dataKey="name"
-              stroke="hsl(var(--muted-foreground))"
-              fontSize={12}
-              tickLine={false}
-              axisLine={false}
-            />
-            <YAxis
-              stroke="hsl(var(--muted-foreground))"
-              fontSize={12}
-              tickLine={false}
-              axisLine={false}
-              tickFormatter={(value) => `$${value}`}
-            />
-            <Tooltip
-              cursorClassName="fill-muted"
-              content={<ChartTooltipContent />}
-            />
-            <Bar
-              dataKey="total"
-              fill="hsl(var(--primary))"
-              radius={[4, 4, 0, 0]}
-            />
-          </BarChart>
-        </ResponsiveContainer>
+        <ChartContainer config={chartConfig} className="h-[350px] w-full">
+            <BarChart data={data}>
+              <XAxis
+                dataKey="name"
+                stroke="hsl(var(--muted-foreground))"
+                fontSize={12}
+                tickLine={false}
+                axisLine={false}
+              />
+              <YAxis
+                stroke="hsl(var(--muted-foreground))"
+                fontSize={12}
+                tickLine={false}
+                axisLine={false}
+                tickFormatter={(value) => `$${value}`}
+              />
+              <Tooltip
+                cursorClassName="fill-muted"
+                content={<ChartTooltipContent />}
+              />
+              <Bar
+                dataKey="total"
+                fill="hsl(var(--primary))"
+                radius={[4, 4, 0, 0]}
+              />
+            </BarChart>
+        </ChartContainer>
       </CardContent>
     </Card>
   );
