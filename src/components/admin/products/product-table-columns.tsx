@@ -16,6 +16,7 @@ import {
 import type { Product } from '@/lib/types';
 import { DataTableColumnHeader } from '@/components/data-table/data-table-columns-header';
 import Image from 'next/image';
+import { cn } from '@/lib/utils';
 
 export const columns: ColumnDef<Product>[] = [
   {
@@ -66,13 +67,17 @@ export const columns: ColumnDef<Product>[] = [
     header: ({ column }) => <DataTableColumnHeader column={column} title="Status" />,
     cell: ({ row }) => {
       const status = row.getValue('status') as Product['status'];
-      const variant: 'outline' | 'secondary' | 'destructive' =
-        status === 'in stock'
-          ? 'outline'
-          : status === 'low stock'
-          ? 'secondary'
-          : 'destructive';
-      return <Badge variant={variant} className="capitalize">{status}</Badge>;
+      return (
+        <Badge
+          className={cn('capitalize', {
+            'bg-green-500/80 text-green-50 hover:bg-green-600 border-green-500': status === 'in stock',
+            'bg-orange-500/80 text-orange-50 hover:bg-orange-600 border-orange-500': status === 'low stock',
+            'bg-red-500/80 text-red-50 hover:bg-red-600 border-red-500': status === 'out of stock',
+          })}
+        >
+          {status}
+        </Badge>
+      );
     },
     filterFn: (row, id, value) => {
       return value.includes(row.getValue(id));
