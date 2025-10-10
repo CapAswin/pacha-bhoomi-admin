@@ -11,7 +11,7 @@ export default {
     extend: {
       fontFamily: {
         body: ['"Nunito Sans"', 'sans-serif'],
-        headline: ['"Lora"', 'serif'],
+        headline: ['"Nunito Sans"', 'sans-serif'],
         code: ['monospace'],
       },
       colors: {
