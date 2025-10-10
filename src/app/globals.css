@@ -80,7 +80,7 @@
   }
   body {
     @apply bg-background text-foreground;
-    background-image: radial-gradient(circle at top right, hsl(var(--primary) / 0.1), transparent 40%);
+    background-image: radial-gradient(circle at bottom left, hsl(var(--primary) / 0.1), transparent 40%);
   }
 }
 
