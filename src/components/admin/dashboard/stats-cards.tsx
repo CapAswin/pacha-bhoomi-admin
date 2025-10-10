@@ -4,7 +4,7 @@ import { DollarSign, Users, CreditCard, Activity } from 'lucide-react';
 export function StatsCards() {
   return (
     <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">
-      <Card>
+      <Card className="animate-slide-in-up" style={{ animationDelay: '100ms' }}>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
           <DollarSign className="h-4 w-4 text-muted-foreground" />
@@ -14,7 +14,7 @@ export function StatsCards() {
           <p className="text-xs text-muted-foreground">+20.1% from last month</p>
         </CardContent>
       </Card>
-      <Card>
+      <Card className="animate-slide-in-up" style={{ animationDelay: '200ms' }}>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Customers</CardTitle>
           <Users className="h-4 w-4 text-muted-foreground" />
@@ -24,7 +24,7 @@ export function StatsCards() {
           <p className="text-xs text-muted-foreground">+180.1% from last month</p>
         </CardContent>
       </Card>
-      <Card>
+      <Card className="animate-slide-in-up" style={{ animationDelay: '300ms' }}>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Sales</CardTitle>
           <CreditCard className="h-4 w-4 text-muted-foreground" />
@@ -34,7 +34,7 @@ export function StatsCards() {
           <p className="text-xs text-muted-foreground">+19% from last month</p>
         </CardContent>
       </Card>
-      <Card>
+      <Card className="animate-slide-in-up" style={{ animationDelay: '400ms' }}>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Active Now</CardTitle>
           <Activity className="h-4 w-4 text-muted-foreground" />

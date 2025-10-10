@@ -22,7 +22,7 @@ export function RecentOrders() {
     const userAvatar = PlaceHolderImages.find(img => img.id === 'user-avatar-2');
 
   return (
-    <Card>
+    <Card className="animate-slide-in-up" style={{ animationDelay: '600ms' }}>
       <CardHeader>
         <CardTitle className="font-headline">Recent Sales</CardTitle>
         <CardDescription>You made 265 sales this month.</CardDescription>

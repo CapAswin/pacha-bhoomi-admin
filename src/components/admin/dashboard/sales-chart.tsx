@@ -34,7 +34,7 @@ const chartConfig = {
 
 export function SalesChart() {
   return (
-    <Card>
+    <Card className="animate-slide-in-up" style={{ animationDelay: '500ms' }}>
       <CardHeader>
         <CardTitle className="font-headline">Overview</CardTitle>
         <CardDescription>
