@@ -92,3 +92,28 @@
     border: 1px solid hsl(var(--border) / 0.2);
   }
 }
+
+@keyframes land-and-rotate {
+  0% {
+    transform: translateY(-200px) rotate(0deg);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  40% {
+    transform: translateY(0) rotate(180deg);
+  }
+  60% {
+    transform: translateY(-15px) rotate(360deg);
+  }
+  75% {
+    transform: translateY(0) rotate(540deg);
+  }
+  85% {
+    transform: translateY(-5px) rotate(630deg);
+  }
+  100% {
+    transform: translateY(0) rotate(720deg);
+  }
+}
