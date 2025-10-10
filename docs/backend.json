@@ -1,3 +1,4 @@
+
 {
   "entities": {
     "Product": {
@@ -208,8 +209,7 @@
   },
   "auth": {
     "providers": [
-      "password",
-      "anonymous"
+      "password"
     ]
   },
   "firestore": {

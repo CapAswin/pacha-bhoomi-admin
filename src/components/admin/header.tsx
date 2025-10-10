@@ -1,8 +1,11 @@
+
+'use client';
+
 import Image from 'next/image';
 import { Search } from 'lucide-react';
-import {
-  SidebarTrigger,
-} from '@/components/ui/sidebar';
+import { useRouter } from 'next/navigation';
+import { useAuth, useUser } from '@/firebase';
+import { SidebarTrigger } from '@/components/ui/sidebar';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,7 +20,15 @@ import { ThemeToggle } from '@/components/theme-toggle';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 export function Header() {
-  const userAvatar = PlaceHolderImages.find(img => img.id === 'user-avatar-1');
+  const userAvatar = PlaceHolderImages.find((img) => img.id === 'user-avatar-1');
+  const { user } = useUser();
+  const auth = useAuth();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    await auth.signOut();
+    router.push('/login');
+  };
 
   return (
     <header className="flex h-14 items-center gap-4 border-b bg-card px-4 lg:h-[60px] lg:px-6">
@@ -38,24 +49,28 @@ export function Header() {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="secondary" size="icon" className="rounded-full">
-            {userAvatar && <Image
-              src={userAvatar.imageUrl}
-              width={36}
-              height={36}
-              alt="User Avatar"
-              className="rounded-full"
-              data-ai-hint={userAvatar.imageHint}
-            />}
+            {userAvatar && (
+              <Image
+                src={userAvatar.imageUrl}
+                width={36}
+                height={36}
+                alt="User Avatar"
+                className="rounded-full"
+                data-ai-hint={userAvatar.imageHint}
+              />
+            )}
             <span className="sr-only">Toggle user menu</span>
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuLabel>My Account</DropdownMenuLabel>
+          <DropdownMenuLabel>
+            {user ? user.email : 'My Account'}
+          </DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem>Settings</DropdownMenuItem>
           <DropdownMenuItem>Support</DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem>Logout</DropdownMenuItem>
+          <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </header>
