@@ -90,7 +90,7 @@ export default function ProductsPage() {
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-6 py-4">
-              <div className="grid gap-2">
+              <div className="space-y-2">
                 <Label htmlFor="name">
                   Name
                 </Label>
@@ -99,7 +99,7 @@ export default function ProductsPage() {
                   defaultValue="Organic Turmeric Powder"
                 />
               </div>
-              <div className="grid gap-2">
+              <div className="space-y-2">
                 <Label htmlFor="description">
                   Description
                 </Label>
@@ -109,6 +109,7 @@ export default function ProductsPage() {
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     className="pr-10"
+                    rows={4}
                   />
                   <Button
                     variant="ghost"
@@ -123,7 +124,7 @@ export default function ProductsPage() {
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
-                <div className="grid gap-2">
+                <div className="space-y-2">
                   <Label htmlFor="price">
                     Price
                   </Label>
@@ -133,7 +134,7 @@ export default function ProductsPage() {
                     defaultValue="12.99"
                   />
                 </div>
-                <div className="grid gap-2">
+                <div className="space-y-2">
                   <Label htmlFor="stock">
                     Stock
                   </Label>
@@ -145,14 +146,14 @@ export default function ProductsPage() {
                 </div>
               </div>
               <Separator />
-               <div className="grid gap-4">
+               <div className="space-y-4">
                  <h3 className="text-sm font-medium">Images</h3>
-                <div className="grid gap-2">
-                  <Label htmlFor="primary-image" className="text-sm font-normal">Primary Image</Label>
+                <div className="space-y-2">
+                  <Label htmlFor="primary-image">Primary Image</Label>
                   <Input id="primary-image" type="file" />
                 </div>
-                <div className="grid gap-2">
-                   <Label htmlFor="additional-images" className="text-sm font-normal">Additional Images</Label>
+                <div className="space-y-2">
+                   <Label htmlFor="additional-images">Additional Images</Label>
                   <Input id="additional-images" type="file" multiple />
                 </div>
               </div>

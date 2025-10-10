@@ -70,14 +70,14 @@ export default function PromotionsPage() {
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-6 py-4">
-              <div className="grid gap-2">
+              <div className="space-y-2">
                 <Label htmlFor="code">
                   Code
                 </Label>
                 <Input id="code" defaultValue="SUMMER25" />
               </div>
               <div className="grid grid-cols-2 gap-4">
-                <div className="grid gap-2">
+                <div className="space-y-2">
                   <Label htmlFor="type">
                     Type
                   </Label>
@@ -92,7 +92,7 @@ export default function PromotionsPage() {
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="grid gap-2">
+                <div className="space-y-2">
                   <Label htmlFor="value">
                     Value
                   </Label>
@@ -100,7 +100,7 @@ export default function PromotionsPage() {
                 </div>
               </div>
                <div className="grid grid-cols-2 gap-4">
-                <div className="grid gap-2">
+                <div className="space-y-2">
                   <Label>Start Date</Label>
                    <Popover>
                     <PopoverTrigger asChild>
@@ -125,7 +125,7 @@ export default function PromotionsPage() {
                     </PopoverContent>
                   </Popover>
                 </div>
-                <div className="grid gap-2">
+                <div className="space-y-2">
                   <Label>End Date</Label>
                   <Popover>
                     <PopoverTrigger asChild>
