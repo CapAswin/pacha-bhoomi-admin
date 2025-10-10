@@ -4,7 +4,7 @@ export function Loader({ className }: { className?: string }) {
   return (
     <div
       className={cn(
-        'relative h-24 w-24 animate-[land-and-rotate_1.5s_ease-out_infinite]',
+        'relative h-24 w-24 animate-[land-and-rotate_1.5s_linear_infinite]',
         className
       )}
       style={{ animationIterationCount: 'infinite' }}
