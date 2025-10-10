@@ -2,11 +2,16 @@ import { cn } from '@/lib/utils';
 
 export function Loader({ className }: { className?: string }) {
   return (
-    <div
-      className={cn(
-        'h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent',
-        className
-      )}
-    ></div>
+    <div className={cn('flex items-center justify-center space-x-2', className)}>
+      <div className="h-3 w-3 animate-pulse-fast rounded-full bg-primary" />
+      <div
+        className="h-3 w-3 animate-pulse-fast rounded-full bg-primary"
+        style={{ animationDelay: '0.2s' }}
+      />
+      <div
+        className="h-3 w-3 animate-pulse-fast rounded-full bg-primary"
+        style={{ animationDelay: '0.4s' }}
+      />
+    </div>
   );
 }
