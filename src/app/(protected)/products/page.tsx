@@ -89,31 +89,31 @@ export default function ProductsPage() {
                 Fill in the details for the new product.
               </DialogDescription>
             </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="name" className="text-right">
+            <div className="grid gap-6 py-4">
+              <div className="grid gap-2">
+                <Label htmlFor="name">
                   Name
                 </Label>
                 <Input
                   id="name"
                   defaultValue="Organic Turmeric Powder"
-                  className="col-span-3"
                 />
               </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="description" className="text-right">
+              <div className="grid gap-2">
+                <Label htmlFor="description">
                   Description
                 </Label>
-                <div className="col-span-3 relative">
+                <div className="relative">
                   <Textarea
                     id="description"
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
+                    className="pr-10"
                   />
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="absolute bottom-2 right-2 h-7 w-7 text-accent"
+                    className="absolute bottom-2 right-2 h-7 w-7 text-accent-foreground"
                     onClick={handleGenerateDescription}
                     disabled={isGenerating}
                   >
@@ -122,43 +122,38 @@ export default function ProductsPage() {
                   </Button>
                 </div>
               </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="price" className="text-right">
-                  Price
-                </Label>
-                <Input
-                  id="price"
-                  type="number"
-                  defaultValue="12.99"
-                  className="col-span-3"
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="stock" className="text-right">
-                  Stock
-                </Label>
-                <Input
-                  id="stock"
-                  type="number"
-                  defaultValue="150"
-                  className="col-span-3"
-                />
+              <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="price">
+                    Price
+                  </Label>
+                  <Input
+                    id="price"
+                    type="number"
+                    defaultValue="12.99"
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="stock">
+                    Stock
+                  </Label>
+                  <Input
+                    id="stock"
+                    type="number"
+                    defaultValue="150"
+                  />
+                </div>
               </div>
               <Separator />
-               <div className="grid grid-cols-4 items-center gap-4">
-                <Label className="text-right">Images</Label>
-                <div className="col-span-3 space-y-2">
-                  <div>
-                    <Label htmlFor="primary-image" className="text-sm font-medium">Primary Image</Label>
-                    <Input id="primary-image" type="file" className="mt-1" />
-                  </div>
-                  <div>
-                     <Label htmlFor="additional-image-1" className="text-sm font-medium">Additional Images (up to 4)</Label>
-                    <Input id="additional-image-1" type="file" className="mt-1" />
-                    <Input id="additional-image-2" type="file" className="mt-2" />
-                    <Input id="additional-image-3" type="file" className="mt-2" />
-                    <Input id="additional-image-4" type="file" className="mt-2" />
-                  </div>
+               <div className="grid gap-4">
+                 <h3 className="text-sm font-medium">Images</h3>
+                <div className="grid gap-2">
+                  <Label htmlFor="primary-image" className="text-sm font-normal">Primary Image</Label>
+                  <Input id="primary-image" type="file" />
+                </div>
+                <div className="grid gap-2">
+                   <Label htmlFor="additional-images" className="text-sm font-normal">Additional Images</Label>
+                  <Input id="additional-images" type="file" multiple />
                 </div>
               </div>
             </div>
