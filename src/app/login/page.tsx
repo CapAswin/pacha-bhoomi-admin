@@ -1,9 +1,9 @@
-
 'use client';
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth, initiateEmailSignIn } from '@/firebase';
+import { useAuth } from '@/firebase';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -28,7 +28,7 @@ export default function LoginPage() {
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      initiateEmailSignIn(auth, email, password);
+      await signInWithEmailAndPassword(auth, email, password);
       toast({
         title: 'Signed In',
         description: "You've been successfully signed in.",

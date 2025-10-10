@@ -1,9 +1,9 @@
-
 'use client';
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth, initiateEmailSignUp } from '@/firebase';
+import { useAuth } from '@/firebase';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -28,7 +28,7 @@ export default function SignupPage() {
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await initiateEmailSignUp(auth, email, password);
+      await createUserWithEmailAndPassword(auth, email, password);
       toast({
         title: 'Account Created',
         description: "Your account has been successfully created.",

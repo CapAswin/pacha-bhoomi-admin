@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import type { ColumnDef } from '@tanstack/react-table';
 import { MoreHorizontal } from 'lucide-react';
@@ -9,12 +9,15 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import type { Customer } from '@/lib/types';
 import { DataTableColumnHeader } from '@/components/data-table/data-table-columns-header';
 
-export const columns: ColumnDef<Customer>[] = [
+export const columns = (
+  onResetPassword: (email: string) => void
+): ColumnDef<Customer>[] => [
   {
     id: 'select',
     header: ({ table }) => (
@@ -39,20 +42,28 @@ export const columns: ColumnDef<Customer>[] = [
   },
   {
     accessorKey: 'name',
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Name" />,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Name" />
+    ),
   },
   {
     accessorKey: 'email',
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Email" />,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Email" />
+    ),
   },
   {
     accessorKey: 'orders',
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Orders" />,
-    cell: ({ row }) => <div className="text-center">{row.getValue('orders')}</div>
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Orders" />
+    ),
+    cell: ({ row }) => <div className="text-center">{row.getValue('orders')}</div>,
   },
   {
     accessorKey: 'totalSpent',
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Total Spent" />,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Total Spent" />
+    ),
     cell: ({ row }) => {
       const amount = parseFloat(row.getValue('totalSpent'));
       const formatted = new Intl.NumberFormat('en-US', {
@@ -65,6 +76,7 @@ export const columns: ColumnDef<Customer>[] = [
   {
     id: 'actions',
     cell: ({ row }) => {
+      const customer = row.original;
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -77,6 +89,10 @@ export const columns: ColumnDef<Customer>[] = [
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem>View profile</DropdownMenuItem>
             <DropdownMenuItem>View order history</DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={() => onResetPassword(customer.email)}>
+              Send Password Reset
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       );
