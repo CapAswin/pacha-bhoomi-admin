@@ -45,7 +45,7 @@ export default function LoginPage() {
       password,
       callbackUrl: `${window.location.origin}/dashboard`,
     });
-
+console.log(res)
     if (res?.error) {
       toast({
         title: "Login Failed",
