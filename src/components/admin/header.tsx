@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
-import { signOut } from "next-auth/react";
 
 export function Header() {
   const userAvatar = PlaceHolderImages.find(

@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { ThemeProvider } from "@/components/theme-provider";
-import { Toaster } from "@/components/ui/toaster";
 import { FirebaseClientProvider } from "@/firebase";
 import "./globals.css";
 import ClientSessionProvider from "./session-provider";
@@ -37,10 +36,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <ClientSessionProvider>
-            <FirebaseClientProvider>
-              {children}
-              <Toaster />
-            </FirebaseClientProvider>
+            <FirebaseClientProvider>{children}</FirebaseClientProvider>
           </ClientSessionProvider>
         </ThemeProvider>
       </body>
