@@ -189,7 +189,6 @@ export default function ProductsPage() {
             <div>Error loading products.</div>
           ) : (
             <ProductTable columns={columns} data={productList} />
-          )}
         </div>
       </div>
     </>

@@ -1,20 +1,22 @@
+"use client";
 
-'use client';
-
-import Image from 'next/image';
-import { Search } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { signOut } from 'next-auth/react';
-import { ThemeToggle } from '@/components/theme-toggle';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
+import Image from "next/image";
+import { Search } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { signOut } from "next-auth/react";
+import { ThemeToggle } from "@/components/theme-toggle";
+import { PlaceHolderImages } from "@/lib/placeholder-images";
+import { signOut } from "next-auth/react";
 
 export function Header() {
-  const userAvatar = PlaceHolderImages.find((img) => img.id === 'user-avatar-1');
+  const userAvatar = PlaceHolderImages.find(
+    (img) => img.id === "user-avatar-1"
+  );
   const router = useRouter();
 
   const handleLogout = async () => {
     await signOut({ redirect: false });
-    router.push('/');
+    router.push("/");
   };
 
   return (

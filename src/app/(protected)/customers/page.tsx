@@ -4,16 +4,11 @@
 import { CustomerTable } from '@/components/admin/customers/customer-table';
 import { columns } from '@/components/admin/customers/customer-table-columns';
 import { customers } from '@/lib/data';
-import { useToast } from '@/hooks/use-toast';
 
 export default function CustomersPage() {
-  const { toast } = useToast();
 
   const handleResetPassword = async (email: string) => {
-    toast({
-      title: 'Action Not Available',
-      description: `Password management has been disabled.`,
-    });
+    console.log(`Password reset for ${email} is not available.`);
   };
 
   return (
