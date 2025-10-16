@@ -7,13 +7,11 @@ import { Mountain, Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { useToast } from "@/hooks/use-toast";
-import { useLoading } from "@/context/LoadingContext";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const { loading, setLoading } = useLoading();
   const router = useRouter();
   const searchParams = useSearchParams();
   const { toast } = useToast();
@@ -40,13 +38,11 @@ export default function LoginPage() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     const res = await signIn("credentials", {
       redirect: false,
       email,
       password,
     });
-    setLoading(false);
 
     if (res?.error) {
       toast({
@@ -58,6 +54,7 @@ export default function LoginPage() {
         toast({
             title: "Login Successful",
             description: `Welcome back!`,
+            variant: "success",
           });
       router.push("/dashboard");
     }
@@ -93,7 +90,6 @@ export default function LoginPage() {
                 placeholder="Email address"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                disabled={loading}
               />
             </div>
             <div className="relative">
@@ -110,13 +106,11 @@ export default function LoginPage() {
                 placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                disabled={loading}
               />
               <button
                 type="button"
                 className="absolute inset-y-0 right-0 flex items-center px-3 text-muted-foreground"
                 onClick={() => setShowPassword(!showPassword)}
-                disabled={loading}
               >
                 {showPassword ? (
                   <EyeOff className="h-5 w-5" />
@@ -145,7 +139,6 @@ export default function LoginPage() {
             <button
               type="submit"
               className="group relative flex w-full justify-center rounded-md border border-transparent bg-primary py-2 px-4 text-sm font-medium text-primary-foreground hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
-              disabled={loading}
             >
               Sign in
             </button>
