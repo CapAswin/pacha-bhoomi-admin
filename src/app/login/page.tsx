@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -5,12 +6,14 @@ import { useRouter } from "next/navigation";
 import { Mountain, Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
+import { useToast } from "@/hooks/use-toast";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
+  const { toast } = useToast();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -21,31 +24,28 @@ export default function LoginPage() {
         password,
       });
       if (res?.error) {
-        // toast({
-        //   title: "Login Failed",
-        //   description: `Please check your credentials and try again.`,
-        //   variant: "destructive",
-        // });
+        toast({
+          title: "Login Failed",
+          description: `Please check your credentials and try again.`,
+          variant: "destructive",
+        });
       } else {
-        // toast({
-        //   title: "Login Successful",
-        //   description: `Welcome back! Logged in as ${email}`,
-        //   variant: "success",
-        // });
+        toast({
+          title: "Login Successful",
+          description: `Welcome back!`,
+        });
 
-        window.location.href = "/";
+        router.push("/dashboard");
       }
     } catch (error) {
       console.error("SignIn error:", error);
 
-      // toast({
-      //   title: "Login Failed",
-      //   description: "Please check your credentials and try again.",
-      //   variant: "destructive",
-      // });
-    } finally {
+      toast({
+        title: "Login Failed",
+        description: "Please check your credentials and try again.",
+        variant: "destructive",
+      });
     }
-    router.push("/dashboard");
   };
 
   return (
