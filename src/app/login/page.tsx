@@ -30,7 +30,6 @@ export default function LoginPage() {
         toast({
             title: "Login Required",
             description: "You must be logged in to view that page.",
-            variant: "destructive",
         });
         // Clean the URL
         router.replace('/login', {scroll: false});
