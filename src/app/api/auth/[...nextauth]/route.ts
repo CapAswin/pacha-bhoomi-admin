@@ -1,4 +1,3 @@
-'use server';
 
 import NextAuth from 'next-auth';
 import type { AuthOptions } from 'next-auth';
