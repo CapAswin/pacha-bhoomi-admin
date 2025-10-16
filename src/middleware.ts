@@ -6,7 +6,7 @@ export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   // Define paths that are public and don't require authentication
-  const publicPaths = ["/login", "/register"];
+  const publicPaths = ["/login", "/register", "/"];
 
   // Check if the current path is a public path
   const isPublicPath = publicPaths.includes(pathname);
@@ -15,7 +15,7 @@ export async function middleware(req: NextRequest) {
   if (token) {
     // If they are on a public path, redirect to the home page
     if (isPublicPath) {
-      return NextResponse.redirect(new URL("/", req.url));
+      return NextResponse.redirect(new URL("/dashboard", req.url));
     }
   }
   // If the user is NOT logged in (no token)
