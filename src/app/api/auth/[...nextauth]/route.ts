@@ -14,7 +14,7 @@ export const authOptions: AuthOptions = {
       },
       async authorize(credentials) {
         if (!credentials) {
-          return null;
+          throw new Error('No credentials provided.');
         }
         const client = await clientPromise;
         const db = client.db('authdb');
@@ -23,8 +23,7 @@ export const authOptions: AuthOptions = {
           .collection('users')
           .findOne({ email: credentials.email });
         if (!user) {
-          console.log("No user found");
-          return null;
+          throw new Error('No user found with this email.');
         }
 
         const isPasswordValid = await bcrypt.compare(
@@ -32,8 +31,7 @@ export const authOptions: AuthOptions = {
           user.password
         );
         if (!isPasswordValid) {
-          console.log("Password invalid");
-          return null;
+          throw new Error('Incorrect password.');
         }
 
         return { id: user._id.toString(), name: user.name, email: user.email };
