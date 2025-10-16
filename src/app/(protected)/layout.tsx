@@ -1,22 +1,19 @@
 'use client';
 
 import type { PropsWithChildren } from 'react';
-import { SidebarProvider, SidebarInset } from '@/components/sidebar';
 import { SidebarNav } from '@/components/admin/sidebar-nav';
 import { Header } from '@/components/admin/header';
 
 export default function DashboardLayout({ children }: PropsWithChildren) {
   return (
-    <SidebarProvider>
+    <div className="flex min-h-screen w-full">
       <SidebarNav />
-      <SidebarInset>
-        <div className="flex flex-col min-h-screen w-full">
-          <Header />
-          <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6 bg-background animate-fade-in">
-            {children}
-          </main>
-        </div>
-      </SidebarInset>
-    </SidebarProvider>
+      <div className="flex flex-col flex-1">
+        <Header />
+        <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6 bg-background">
+          {children}
+        </main>
+      </div>
+    </div>
   );
 }

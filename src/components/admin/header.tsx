@@ -1,10 +1,8 @@
-
 'use client';
 
 import Image from 'next/image';
 import { Search } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { SidebarTrigger } from '@/components/sidebar';
 import { useState } from 'react';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
@@ -20,7 +18,6 @@ export function Header() {
 
   return (
     <header className="flex h-14 items-center gap-4 border-b bg-card px-4 lg:h-[60px] lg:px-6">
-      <SidebarTrigger className="shrink-0 md:hidden" />
       <div className="w-full flex-1">
         <form>
           <div className="relative">
@@ -52,7 +49,7 @@ export function Header() {
             <div className="absolute right-0 mt-2 w-48 origin-top-right rounded-md bg-popover text-popover-foreground shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none py-1 animate-in fade-in-0 zoom-in-95" role="menu">
                 <div className="px-3 py-2 text-sm font-semibold" role="none">My Account</div>
                 <hr className="-mx-1 my-1 h-px bg-muted"/>
-                <a href="#" className="block px-3 py-2 text-sm text-popover-foreground hover:bg-accent rounded-sm" role="menuitem">Settings</a>
+                <a href="/settings" className="block px-3 py-2 text-sm text-popover-foreground hover:bg-accent rounded-sm" role="menuitem">Settings</a>
                 <a href="#" className="block px-3 py-2 text-sm text-popover-foreground hover:bg-accent rounded-sm" role="menuitem">Support</a>
                 <hr className="-mx-1 my-1 h-px bg-muted"/>
                 <a href="#" onClick={handleLogout} className="block px-3 py-2 text-sm text-popover-foreground hover:bg-accent rounded-sm" role="menuitem">Logout</a>
