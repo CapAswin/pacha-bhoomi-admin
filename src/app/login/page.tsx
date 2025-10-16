@@ -43,9 +43,8 @@ export default function LoginPage() {
       redirect: false,
       email,
       password,
-      callbackUrl: `${window.location.origin}/dashboard`,
     });
-console.log(res)
+
     if (res?.error) {
       toast({
         title: "Login Failed",
@@ -53,11 +52,11 @@ console.log(res)
         variant: "destructive",
       });
     } else if (res?.ok) {
-      toast({
-        title: "Login Successful",
-        description: `Welcome back!`,
-      });
-      router.push(res.url || "/dashboard");
+        toast({
+            title: "Login Successful",
+            description: `Welcome back!`,
+          });
+      router.push("/dashboard");
     }
   };
 
