@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect } from "react";
@@ -25,15 +24,15 @@ export default function LoginPage() {
         variant: "destructive",
       });
       // Clean the URL
-      router.replace('/login', {scroll: false});
-    } else if(searchParams.get("callbackUrl")) {
-        toast({
-            title: "Login Required",
-            description: "You must be logged in to view that page.",
-            variant: "destructive",
-        });
-        // Clean the URL
-        router.replace('/login', {scroll: false});
+      router.replace("/login", { scroll: false });
+    } else if (searchParams.get("callbackUrl")) {
+      toast({
+        title: "Login Required",
+        description: "You must be logged in to view that page.",
+        variant: "destructive",
+      });
+      // Clean the URL
+      router.replace("/login", { scroll: false });
     }
   }, [searchParams, router, toast]);
 
@@ -44,6 +43,7 @@ export default function LoginPage() {
       email,
       password,
     });
+    console.log("res: ", res);
 
     if (res?.error) {
       toast({
@@ -52,10 +52,10 @@ export default function LoginPage() {
         variant: "destructive",
       });
     } else if (res?.ok) {
-        toast({
-            title: "Login Successful",
-            description: `Welcome back!`,
-          });
+      toast({
+        title: "Login Successful",
+        description: `Welcome back!`,
+      });
       router.push("/dashboard");
     }
   };
