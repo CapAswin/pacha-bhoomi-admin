@@ -1,6 +1,20 @@
-export { default } from "next-auth/middleware"
 
-export const config = { matcher: [
+import { withAuth } from "next-auth/middleware"
+import { NextResponse } from "next/server"
+
+export default withAuth(
+  function middleware(req) {
+    return NextResponse.next()
+  },
+  {
+    callbacks: {
+      authorized: ({ token }) => !!token,
+    },
+  }
+)
+
+export const config = {
+  matcher: [
     "/dashboard",
     "/orders",
     "/products",
@@ -8,4 +22,5 @@ export const config = { matcher: [
     "/promotions",
     "/settings",
     "/loader-test",
-] }
+  ],
+}

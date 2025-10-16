@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Mountain, Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
@@ -12,37 +12,51 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { toast } = useToast();
+
+  useEffect(() => {
+    const error = searchParams.get("error");
+    if (error === "CredentialsSignin") {
+      toast({
+        title: "Login Failed",
+        description: "Invalid email or password. Please try again.",
+        variant: "destructive",
+      });
+      // Clean the URL
+      router.replace('/login', {scroll: false});
+    } else if(searchParams.get("callbackUrl")) {
+        toast({
+            title: "Login Required",
+            description: "You must be logged in to view that page.",
+            variant: "destructive",
+        });
+        // Clean the URL
+        router.replace('/login', {scroll: false});
+    }
+  }, [searchParams, router, toast]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    try {
-      const res = await signIn("credentials", {
-        redirect: false,
-        email,
-        password,
-      });
+    const res = await signIn("credentials", {
+      redirect: false,
+      email,
+      password,
+      callbackUrl: `${window.location.origin}/dashboard`,
+    });
 
-      if (res?.error) {
-        toast({
-          title: "Login Failed",
-          description: "Invalid email or password. Please try again.",
-          variant: "destructive",
-        });
-      } else if (res?.ok) {
-        toast({
-          title: "Login Successful",
-          description: `Welcome back!`,
-        });
-        router.push("/dashboard");
-      }
-    } catch (error) {
-      console.error("SignIn error:", error);
+    if (res?.error) {
       toast({
         title: "Login Failed",
-        description: "An unexpected error occurred. Please try again.",
+        description: "Invalid email or password. Please try again.",
         variant: "destructive",
       });
+    } else if (res?.ok) {
+      toast({
+        title: "Login Successful",
+        description: `Welcome back!`,
+      });
+      router.push(res.url || "/dashboard");
     }
   };
 

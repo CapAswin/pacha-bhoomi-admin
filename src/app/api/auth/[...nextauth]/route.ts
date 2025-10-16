@@ -1,4 +1,3 @@
-
 import NextAuth from 'next-auth';
 import type { AuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
@@ -24,7 +23,8 @@ export const authOptions: AuthOptions = {
           .collection('users')
           .findOne({ email: credentials.email });
         if (!user) {
-          throw new Error("No user found with this email");
+          console.log("No user found");
+          return null;
         }
 
         const isPasswordValid = await bcrypt.compare(
@@ -32,7 +32,8 @@ export const authOptions: AuthOptions = {
           user.password
         );
         if (!isPasswordValid) {
-          throw new Error("Incorrect password");
+          console.log("Password invalid");
+          return null;
         }
 
         return { id: user._id.toString(), name: user.name, email: user.email };
