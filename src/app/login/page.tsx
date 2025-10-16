@@ -6,7 +6,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Mountain, Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
-import { useToast } from "@/hooks/use-toast";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -14,27 +13,17 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { toast } = useToast();
 
   useEffect(() => {
     const error = searchParams.get("error");
     if (error === "CredentialsSignin") {
-      toast({
-        title: "Login Failed",
-        description: "Invalid email or password. Please try again.",
-        variant: "destructive",
-      });
       // Clean the URL
       router.replace('/login', {scroll: false});
     } else if(searchParams.get("callbackUrl")) {
-        toast({
-            title: "Login Required",
-            description: "You must be logged in to view that page.",
-        });
         // Clean the URL
         router.replace('/login', {scroll: false});
     }
-  }, [searchParams, router, toast]);
+  }, [searchParams, router]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,17 +34,8 @@ export default function LoginPage() {
     });
 
     if (res?.error) {
-      toast({
-        title: "Login Failed",
-        description: "Invalid email or password. Please try again.",
-        variant: "destructive",
-      });
+      console.error("Login Failed: Invalid email or password.");
     } else if (res?.ok) {
-        toast({
-            title: "Login Successful",
-            description: `Welcome back!`,
-            variant: "success",
-          });
       router.push("/dashboard");
     }
   };
