@@ -8,7 +8,7 @@ import type {
 } from "@/components/ui/toast"
 
 const TOAST_LIMIT = 1
-const TOAST_REMOVE_DELAY = 1000000
+const TOAST_REMOVE_DELAY = 5000
 
 type ToasterToast = ToastProps & {
   id: string
@@ -92,24 +92,17 @@ export const reducer = (state: State, action: Action): State => {
     case "DISMISS_TOAST": {
       const { toastId } = action
 
+      // Instead of setting a timeout, we'll just remove the toast immediately.
       if (toastId) {
-        addToRemoveQueue(toastId)
+        return {
+            ...state,
+            toasts: state.toasts.filter((t) => t.id !== toastId)
+        }
       } else {
-        state.toasts.forEach((toast) => {
-          addToRemoveQueue(toast.id)
-        })
-      }
-
-      return {
-        ...state,
-        toasts: state.toasts.map((t) =>
-          t.id === toastId || toastId === undefined
-            ? {
-                ...t,
-                open: false,
-              }
-            : t
-        ),
+        return {
+            ...state,
+            toasts: []
+        }
       }
     }
     case "REMOVE_TOAST":

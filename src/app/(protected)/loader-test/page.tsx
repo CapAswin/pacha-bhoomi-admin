@@ -1,5 +1,5 @@
 
-import { Loader } from '@/components/ui/loader';
+import { Loader } from '@/components/ui/Loading';
 
 export default function LoaderTestPage() {
   return (
