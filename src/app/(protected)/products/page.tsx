@@ -8,33 +8,22 @@ import {
   generateProductDescription,
   type GenerateProductDescriptionInput,
 } from '@/ai/ai-product-description';
-import { useToast } from '@/hooks/use-toast';
 import type { Product } from '@/lib/types';
-import { ProductTableSkeleton } from '@/components/admin/products/product-table-skeleton';
 import { ProductTable } from '@/components/admin/products/product-table';
 import { columns } from '@/components/admin/products/product-table-columns';
 
 export default function ProductsPage() {
-  const { toast } = useToast();
   const [description, setDescription] = React.useState(
     'High-quality organic turmeric powder, sourced sustainably.'
   );
-  const [isGenerating, setIsGenerating] = React.useState(false);
-  const [isLoading, setIsLoading] = React.useState(true);
   const [productList, setProductList] = React.useState<Product[]>([]);
   const [isModalOpen, setIsModalOpen] = React.useState(false);
 
   React.useEffect(() => {
-    // Simulate fetching data
-    const timer = setTimeout(() => {
-      setProductList(products);
-      setIsLoading(false);
-    }, 1500); // 1.5 second delay
-    return () => clearTimeout(timer);
+    setProductList(products);
   }, []);
 
   async function handleGenerateDescription() {
-    setIsGenerating(true);
     try {
       const input: GenerateProductDescriptionInput = {
         attributes: 'organic, non-gmo, sustainably-sourced',
@@ -44,21 +33,9 @@ export default function ProductsPage() {
       const result = await generateProductDescription(input);
       if (result.description) {
         setDescription(result.description);
-        toast({
-          title: 'Description Generated',
-          description: 'The AI-powered description has been generated.',
-        });
       }
     } catch (error) {
       console.error('Failed to generate description:', error);
-      toast({
-        variant: 'destructive',
-        title: 'Generation Failed',
-        description:
-          'Could not generate a new description. Please try again.',
-      });
-    } finally {
-      setIsGenerating(false);
     }
   }
 
@@ -109,7 +86,6 @@ export default function ProductsPage() {
                   <button
                     className="absolute bottom-2 right-2 h-7 w-7 text-accent-foreground inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground"
                     onClick={handleGenerateDescription}
-                    disabled={isGenerating}
                   >
                     <Bot className="h-4 w-4" />
                     <span className="sr-only">Generate with AI</span>
@@ -168,11 +144,7 @@ export default function ProductsPage() {
           </p>
         </div>
         <div className="p-6 pt-0">
-          {isLoading ? (
-            <ProductTableSkeleton />
-          ) : (
             <ProductTable columns={columns} data={productList} />
-          )}
         </div>
       </div>
     </>
