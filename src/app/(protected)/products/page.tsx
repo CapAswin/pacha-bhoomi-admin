@@ -3,25 +3,56 @@
 
 import React from 'react';
 import { Bot, PlusCircle } from 'lucide-react';
-import { products } from '@/lib/data';
 import {
   generateProductDescription,
   type GenerateProductDescriptionInput,
 } from '@/ai/ai-product-description';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import type { Product } from '@/lib/types';
 import { ProductTable } from '@/components/admin/products/product-table';
 import { columns } from '@/components/admin/products/product-table-columns';
+import { ProductTableSkeleton } from '@/components/admin/products/product-table-skeleton';
+
+async function fetchProducts(): Promise<Product[]> {
+  const response = await fetch('/api/products');
+  if (!response.ok) {
+    throw new Error('Failed to fetch products');
+  }
+  return response.json();
+}
+
+async function addProduct(newProduct: Omit<Product, 'id' | 'revenue' | 'sales'>): Promise<Product> {
+  const response = await fetch('/api/products', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(newProduct),
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to add product');
+  }
+
+  return response.json();
+}
 
 export default function ProductsPage() {
+  const queryClient = useQueryClient();
   const [description, setDescription] = React.useState(
     'High-quality organic turmeric powder, sourced sustainably.'
   );
-  const [productList, setProductList] = React.useState<Product[]>([]);
   const [isModalOpen, setIsModalOpen] = React.useState(false);
 
-  React.useEffect(() => {
-    setProductList(products);
-  }, []);
+  const { data: productList = [], isLoading, isError } = useQuery<Product[]>({ queryKey: ['products'], queryFn: fetchProducts });
+
+  const mutation = useMutation({ 
+    mutationFn: addProduct, 
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['products'] });
+      setIsModalOpen(false);
+    }
+  });
 
   async function handleGenerateDescription() {
     try {
@@ -39,35 +70,19 @@ export default function ProductsPage() {
     }
   }
 
-  async function handleSaveProduct(event: React.FormEvent<HTMLFormElement>) {
+  function handleSaveProduct(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
     const productData = {
       name: formData.get('name') as string,
       description: formData.get('description') as string,
-      price: formData.get('price') as string,
-      inventory: formData.get('stock') as string,
+      price: parseFloat(formData.get('price') as string),
+      inventory: parseInt(formData.get('stock') as string, 10),
+      category: 'default',
+      imageUrl: ''
     };
 
-    try {
-      const response = await fetch('/api/products', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(productData),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to save product');
-      }
-
-      const newProduct = await response.json();
-      setProductList([newProduct, ...productList]);
-      setIsModalOpen(false);
-    } catch (error) {
-      console.error(error);
-    }
+    mutation.mutate(productData);
   }
 
   return (
@@ -148,20 +163,8 @@ export default function ProductsPage() {
                     name="stock"
                     type="number"
                     defaultValue="150"
-                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
+                    className="flex h-10 w-full rounded-md border border-.input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
                   />
-                </div>
-              </div>
-              <hr className="shrink-0 bg-border h-[1px] w-full" />
-               <div className="space-y-4">
-                 <h3 className="text-sm font-medium">Images</h3>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70" htmlFor="primary-image">Primary Image</label>
-                  <input className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm" id="primary-image" type="file" />
-                </div>
-                <div className="space-y-2">
-                   <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70" htmlFor="additional-images">Additional Images</label>
-                  <input className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm" id="additional-images" type="file" multiple />
                 </div>
               </div>
             </div>
@@ -180,7 +183,13 @@ export default function ProductsPage() {
           </p>
         </div>
         <div className="p-6 pt-0">
+          {isLoading ? (
+            <ProductTableSkeleton />
+          ) : isError ? (
+            <div>Error loading products.</div>
+          ) : (
             <ProductTable columns={columns} data={productList} />
+          )}
         </div>
       </div>
     </>
