@@ -1,34 +1,63 @@
+"use client";
 
-'use client';
-
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { Mountain, Eye, EyeOff } from 'lucide-react';
-import Link from 'next/link';
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Mountain, Eye, EyeOff } from "lucide-react";
+import Link from "next/link";
+import { signIn } from "next-auth/react";
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    // For now, we'll just redirect to the dashboard.
-    // In a real app, you'd handle authentication here.
-    router.push('/dashboard');
+    try {
+      const res = await signIn("credentials", {
+        redirect: false,
+        email,
+        password,
+      });
+      if (res?.error) {
+        // toast({
+        //   title: "Login Failed",
+        //   description: `Please check your credentials and try again.`,
+        //   variant: "destructive",
+        // });
+      } else {
+        // toast({
+        //   title: "Login Successful",
+        //   description: `Welcome back! Logged in as ${email}`,
+        //   variant: "success",
+        // });
+
+        window.location.href = "/";
+      }
+    } catch (error) {
+      console.error("SignIn error:", error);
+
+      // toast({
+      //   title: "Login Failed",
+      //   description: "Please check your credentials and try again.",
+      //   variant: "destructive",
+      // });
+    } finally {
+    }
+    router.push("/dashboard");
   };
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4 py-12 sm:px-6 lg:px-8">
       <div className="w-full max-w-md space-y-8">
         <div className="text-center">
-            <div className="flex justify-center items-center gap-2 mb-4">
-                 <Mountain className="h-8 w-8 text-primary" />
-                <h1 className="text-3xl font-bold tracking-tight text-foreground font-headline">
-                    Pacha Bhoomi
-                </h1>
-            </div>
+          <div className="flex justify-center items-center gap-2 mb-4">
+            <Mountain className="h-8 w-8 text-primary" />
+            <h1 className="text-3xl font-bold tracking-tight text-foreground font-headline">
+              Pacha Bhoomi
+            </h1>
+          </div>
           <h2 className="mt-6 text-center text-2xl font-bold tracking-tight text-foreground">
             Sign in to your account
           </h2>
@@ -58,7 +87,7 @@ export default function LoginPage() {
               <input
                 id="password"
                 name="password"
-                type={showPassword ? 'text' : 'password'}
+                type={showPassword ? "text" : "password"}
                 autoComplete="current-password"
                 required
                 className="relative block w-full appearance-none rounded-b-md border border-input bg-background px-3 py-2 text-foreground placeholder-muted-foreground focus:z-10 focus:border-primary focus:outline-none focus:ring-primary sm:text-sm pr-10"
@@ -77,7 +106,7 @@ export default function LoginPage() {
                   <Eye className="h-5 w-5" />
                 )}
                 <span className="sr-only">
-                  {showPassword ? 'Hide password' : 'Show password'}
+                  {showPassword ? "Hide password" : "Show password"}
                 </span>
               </button>
             </div>
@@ -103,11 +132,14 @@ export default function LoginPage() {
             </button>
           </div>
         </form>
-         <p className="mt-2 text-center text-sm text-muted-foreground">
-            Don&apos;t have an account?{' '}
-            <Link href="#" className="font-medium text-primary hover:text-primary/90">
-                Sign up
-            </Link>
+        <p className="mt-2 text-center text-sm text-muted-foreground">
+          Don&apos;t have an account?{" "}
+          <Link
+            href="#"
+            className="font-medium text-primary hover:text-primary/90"
+          >
+            Sign up
+          </Link>
         </p>
       </div>
     </div>
