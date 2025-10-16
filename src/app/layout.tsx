@@ -4,7 +4,7 @@ import { ThemeProvider } from '@/components/theme-provider';
 import { Toaster } from '@/components/ui/toaster';
 import { FirebaseClientProvider } from '@/firebase';
 import './globals.css';
-import { SessionProvider } from "next-auth/react";
+import ClientSessionProvider from "./session-provider";
 
 export const metadata: Metadata = {
   title: 'Pacha Bhoomi Admin',
@@ -37,12 +37,12 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <SessionProvider>
+          <ClientSessionProvider>
             <FirebaseClientProvider>
               {children}
               <Toaster />
             </FirebaseClientProvider>
-          </SessionProvider>
+          </ClientSessionProvider>
         </ThemeProvider>
       </body>
     </html>
