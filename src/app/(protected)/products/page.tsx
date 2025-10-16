@@ -21,7 +21,7 @@ async function fetchProducts(): Promise<Product[]> {
   return response.json();
 }
 
-async function addProduct(newProduct: Omit<Product, 'id' | 'revenue' | 'sales'>): Promise<Product> {
+async function addProduct(newProduct: Omit<Product, 'id' | 'status' | 'images'> & { category: string, imageUrl: string }): Promise<Product> {
   const response = await fetch('/api/products', {
     method: 'POST',
     headers: {
@@ -77,7 +77,7 @@ export default function ProductsPage() {
       name: formData.get('name') as string,
       description: formData.get('description') as string,
       price: parseFloat(formData.get('price') as string),
-      inventory: parseInt(formData.get('stock') as string, 10),
+      stock: parseInt(formData.get('stock') as string, 10),
       category: 'default',
       imageUrl: ''
     };
@@ -163,7 +163,7 @@ export default function ProductsPage() {
                     name="stock"
                     type="number"
                     defaultValue="150"
-                    className="flex h-10 w-full rounded-md border border-.input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
                   />
                 </div>
               </div>
