@@ -46,7 +46,7 @@ export function Header() {
             <span className="sr-only">Toggle user menu</span>
         </button>
         {isMenuOpen && (
-            <div className="absolute right-0 mt-2 w-48 origin-top-right rounded-md bg-popover text-popover-foreground shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none py-1 animate-in fade-in-0 zoom-in-95" role="menu">
+            <div className="absolute right-0 mt-2 w-48 origin-top-right rounded-md bg-popover text-popover-foreground shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none py-1 animate-in fade-in-0 zoom-in-95 z-50" role="menu">
                 <div className="px-3 py-2 text-sm font-semibold" role="none">My Account</div>
                 <hr className="-mx-1 my-1 h-px bg-muted"/>
                 <a href="/settings" className="block px-3 py-2 text-sm text-popover-foreground hover:bg-accent rounded-sm" role="menuitem">Settings</a>
