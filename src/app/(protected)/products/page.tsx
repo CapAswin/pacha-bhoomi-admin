@@ -8,33 +8,22 @@ import {
   generateProductDescription,
   type GenerateProductDescriptionInput,
 } from '@/ai/ai-product-description';
-import { useToast } from '@/hooks/use-toast';
 import type { Product } from '@/lib/types';
-import { ProductTableSkeleton } from '@/components/admin/products/product-table-skeleton';
 import { ProductTable } from '@/components/admin/products/product-table';
 import { columns } from '@/components/admin/products/product-table-columns';
 
 export default function ProductsPage() {
-  const { toast } = useToast();
   const [description, setDescription] = React.useState(
     'High-quality organic turmeric powder, sourced sustainably.'
   );
-  const [isGenerating, setIsGenerating] = React.useState(false);
-  const [isLoading, setIsLoading] = React.useState(true);
   const [productList, setProductList] = React.useState<Product[]>([]);
   const [isModalOpen, setIsModalOpen] = React.useState(false);
 
   React.useEffect(() => {
-    // Simulate fetching data
-    const timer = setTimeout(() => {
-      setProductList(products);
-      setIsLoading(false);
-    }, 1500); // 1.5 second delay
-    return () => clearTimeout(timer);
+    setProductList(products);
   }, []);
 
   async function handleGenerateDescription() {
-    setIsGenerating(true);
     try {
       const input: GenerateProductDescriptionInput = {
         attributes: 'organic, non-gmo, sustainably-sourced',
@@ -44,21 +33,40 @@ export default function ProductsPage() {
       const result = await generateProductDescription(input);
       if (result.description) {
         setDescription(result.description);
-        toast({
-          title: 'Description Generated',
-          description: 'The AI-powered description has been generated.',
-        });
       }
     } catch (error) {
       console.error('Failed to generate description:', error);
-      toast({
-        variant: 'destructive',
-        title: 'Generation Failed',
-        description:
-          'Could not generate a new description. Please try again.',
+    }
+  }
+
+  async function handleSaveProduct(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    const productData = {
+      name: formData.get('name') as string,
+      description: formData.get('description') as string,
+      price: formData.get('price') as string,
+      inventory: formData.get('stock') as string,
+    };
+
+    try {
+      const response = await fetch('/api/products', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(productData),
       });
-    } finally {
-      setIsGenerating(false);
+
+      if (!response.ok) {
+        throw new Error('Failed to save product');
+      }
+
+      const newProduct = await response.json();
+      setProductList([newProduct, ...productList]);
+      setIsModalOpen(false);
+    } catch (error) {
+      console.error(error);
     }
   }
 
@@ -76,7 +84,7 @@ export default function ProductsPage() {
 
       {isModalOpen && (
          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 animate-in fade-in-0">
-           <div className="relative z-50 grid w-full max-w-lg translate-y-0 gap-4 border bg-background p-6 shadow-lg duration-200 sm:rounded-lg animate-in fade-in-0 zoom-in-95 slide-in-from-top-[48%]">
+           <form onSubmit={handleSaveProduct} className="relative z-50 grid w-full max-w-lg translate-y-0 gap-4 border bg-background p-6 shadow-lg duration-200 sm:rounded-lg animate-in fade-in-0 zoom-in-95 slide-in-from-top-[48%]">
             <div className="flex flex-col space-y-1.5 text-center sm:text-left">
               <h2 className="text-lg font-semibold leading-none tracking-tight">Add New Product</h2>
               <p className="text-sm text-muted-foreground">
@@ -90,6 +98,7 @@ export default function ProductsPage() {
                 </label>
                 <input
                   id="name"
+                  name="name"
                   defaultValue="Organic Turmeric Powder"
                   className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
                 />
@@ -101,15 +110,16 @@ export default function ProductsPage() {
                 <div className="relative">
                   <textarea
                     id="description"
+                    name="description"
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm pr-10"
                     rows={4}
                   />
                   <button
+                    type="button"
                     className="absolute bottom-2 right-2 h-7 w-7 text-accent-foreground inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground"
                     onClick={handleGenerateDescription}
-                    disabled={isGenerating}
                   >
                     <Bot className="h-4 w-4" />
                     <span className="sr-only">Generate with AI</span>
@@ -123,6 +133,7 @@ export default function ProductsPage() {
                   </label>
                   <input
                     id="price"
+                    name="price"
                     type="number"
                     defaultValue="12.99"
                     className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
@@ -134,6 +145,7 @@ export default function ProductsPage() {
                   </label>
                   <input
                     id="stock"
+                    name="stock"
                     type="number"
                     defaultValue="150"
                     className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
@@ -154,9 +166,9 @@ export default function ProductsPage() {
               </div>
             </div>
             <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2">
-              <button onClick={() => setIsModalOpen(false)} className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2">Save Product</button>
+              <button type="submit" className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2">Save Product</button>
             </div>
-          </div>
+           </form>
         </div>
       )}
 
@@ -168,11 +180,7 @@ export default function ProductsPage() {
           </p>
         </div>
         <div className="p-6 pt-0">
-          {isLoading ? (
-            <ProductTableSkeleton />
-          ) : (
             <ProductTable columns={columns} data={productList} />
-          )}
         </div>
       </div>
     </>
