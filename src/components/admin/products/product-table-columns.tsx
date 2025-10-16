@@ -3,38 +3,29 @@
 
 import type { ColumnDef } from '@tanstack/react-table';
 import { MoreHorizontal } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import type { Product } from '@/lib/types';
-import { DataTableColumnHeader } from '@/components/data-table/data-table-columns-header';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
+import { useState } from 'react';
 
 export const columns: ColumnDef<Product>[] = [
   {
     id: 'select',
     header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && 'indeterminate')
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+      <input
+        type="checkbox"
+        className="h-4 w-4 shrink-0 rounded-sm border border-primary"
+        checked={table.getIsAllPageRowsSelected()}
+        onChange={(value) => table.toggleAllPageRowsSelected(!!value.target.checked)}
         aria-label="Select all"
       />
     ),
     cell: ({ row }) => (
-      <Checkbox
+      <input
+        type="checkbox"
+        className="h-4 w-4 shrink-0 rounded-sm border border-primary"
         checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
+        onChange={(value) => row.toggleSelected(!!value.target.checked)}
         aria-label="Select row"
       />
     ),
@@ -43,7 +34,7 @@ export const columns: ColumnDef<Product>[] = [
   },
   {
     accessorKey: 'name',
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Product" />,
+    header: 'Product',
     cell: ({ row }) => {
         const product = row.original;
         return (
@@ -64,19 +55,19 @@ export const columns: ColumnDef<Product>[] = [
   },
   {
     accessorKey: 'status',
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Status" />,
+    header: 'Status',
     cell: ({ row }) => {
       const status = row.getValue('status') as Product['status'];
       return (
-        <Badge
-          className={cn('capitalize', {
+        <div
+          className={cn('inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold capitalize', {
             'bg-green-500/80 text-green-50 hover:bg-green-600 border-green-500': status === 'in stock',
             'bg-orange-500/80 text-orange-50 hover:bg-orange-600 border-orange-500': status === 'low stock',
             'bg-red-500/80 text-red-50 hover:bg-red-600 border-red-500': status === 'out of stock',
           })}
         >
           {status}
-        </Badge>
+        </div>
       );
     },
     filterFn: (row, id, value) => {
@@ -85,12 +76,12 @@ export const columns: ColumnDef<Product>[] = [
   },
   {
     accessorKey: 'stock',
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Stock" />,
+    header: 'Stock',
     cell: ({ row }) => <div className="text-right">{row.getValue('stock')}</div>,
   },
   {
     accessorKey: 'price',
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Price" />,
+    header: 'Price',
     cell: ({ row }) => {
       const amount = parseFloat(row.getValue('price'));
       const formatted = new Intl.NumberFormat('en-US', {
@@ -104,25 +95,30 @@ export const columns: ColumnDef<Product>[] = [
     id: 'actions',
     cell: ({ row }) => {
       const product = row.original;
+      const [isOpen, setIsOpen] = useState(false);
       return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(product.id)}
-            >
-              Copy product ID
-            </DropdownMenuItem>
-            <DropdownMenuItem>Edit</DropdownMenuItem>
-            <DropdownMenuItem className="text-destructive focus:text-destructive focus:bg-destructive/10">Delete</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className="relative">
+          <button onClick={() => setIsOpen(!isOpen)} className="h-8 w-8 p-0 flex items-center justify-center rounded-md hover:bg-accent">
+            <span className="sr-only">Open menu</span>
+            <MoreHorizontal className="h-4 w-4" />
+          </button>
+          {isOpen && (
+             <div className="absolute right-0 z-50 min-w-[8rem] overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-md">
+                <div className="px-2 py-1.5 text-sm font-semibold">Actions</div>
+                <div
+                    className="relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-accent focus:bg-accent"
+                    onClick={() => {
+                        navigator.clipboard.writeText(product.id);
+                        setIsOpen(false);
+                    }}
+                >
+                Copy product ID
+                </div>
+                <div onClick={() => setIsOpen(false)} className="relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-accent focus:bg-accent">Edit</div>
+                <div onClick={() => setIsOpen(false)} className="relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors text-destructive focus:bg-destructive/10 focus:text-destructive">Delete</div>
+          </div>
+          )}
+        </div>
       );
     },
   },

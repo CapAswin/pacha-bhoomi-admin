@@ -4,27 +4,17 @@
 import Image from 'next/image';
 import { Search } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { SidebarTrigger } from '@/components/ui/sidebar';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { SidebarTrigger } from '@/components/sidebar';
+import { useState } from 'react';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 export function Header() {
   const userAvatar = PlaceHolderImages.find((img) => img.id === 'user-avatar-1');
   const router = useRouter();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const handleLogout = () => {
-    // Since we are removing login, this can just redirect to a conceptual "logged out" state.
-    // For now, we'll just go to the main page which redirects to dashboard.
     router.push('/');
   };
 
@@ -35,18 +25,17 @@ export function Header() {
         <form>
           <div className="relative">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
+            <input
               type="search"
               placeholder="Search..."
-              className="w-full appearance-none bg-background pl-8 shadow-none md:w-2/3 lg:w-1/3"
+              className="w-full appearance-none bg-background pl-8 shadow-none md:w-2/3 lg:w-1/3 flex h-10 rounded-md border border-input px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
             />
           </div>
         </form>
       </div>
       <ThemeToggle />
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="secondary" size="icon" className="rounded-full">
+      <div className="relative">
+        <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="rounded-full border-2 border-transparent focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
             {userAvatar && (
               <Image
                 src={userAvatar.imageUrl}
@@ -58,19 +47,18 @@ export function Header() {
               />
             )}
             <span className="sr-only">Toggle user menu</span>
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuLabel>
-            My Account
-          </DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem>Settings</DropdownMenuItem>
-          <DropdownMenuItem>Support</DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+        </button>
+        {isMenuOpen && (
+            <div className="absolute right-0 mt-2 w-48 origin-top-right rounded-md bg-popover text-popover-foreground shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none py-1 animate-in fade-in-0 zoom-in-95" role="menu">
+                <div className="px-3 py-2 text-sm font-semibold" role="none">My Account</div>
+                <hr className="-mx-1 my-1 h-px bg-muted"/>
+                <a href="#" className="block px-3 py-2 text-sm text-popover-foreground hover:bg-accent rounded-sm" role="menuitem">Settings</a>
+                <a href="#" className="block px-3 py-2 text-sm text-popover-foreground hover:bg-accent rounded-sm" role="menuitem">Support</a>
+                <hr className="-mx-1 my-1 h-px bg-muted"/>
+                <a href="#" onClick={handleLogout} className="block px-3 py-2 text-sm text-popover-foreground hover:bg-accent rounded-sm" role="menuitem">Logout</a>
+            </div>
+        )}
+      </div>
     </header>
   );
 }

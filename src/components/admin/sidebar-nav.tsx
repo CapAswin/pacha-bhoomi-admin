@@ -22,9 +22,8 @@ import {
   SidebarMenuButton,
   SidebarContent,
   SidebarFooter,
-} from '@/components/ui/sidebar';
+} from '@/components/sidebar';
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
 
 const navItems = [
   { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
@@ -42,10 +41,10 @@ export function SidebarNav() {
     <Sidebar>
       <SidebarHeader>
         <Link href="/dashboard" className="flex items-center gap-2">
-          <Button variant="ghost" className="h-10 w-full justify-start px-2 font-headline text-lg">
+          <button className="h-10 w-full justify-start px-2 font-headline text-lg hover:bg-accent hover:text-accent-foreground inline-flex items-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50">
             <Mountain className="h-6 w-6 text-primary" />
             <span className={cn('group-data-[collapsible=icon]:hidden')}>Pacha Bhoomi</span>
-          </Button>
+          </button>
         </Link>
       </SidebarHeader>
       <SidebarContent>

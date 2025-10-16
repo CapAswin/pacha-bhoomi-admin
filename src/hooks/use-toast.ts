@@ -140,7 +140,7 @@ function dispatch(action: Action) {
   })
 }
 
-type Toast = Omit<ToasterToast, "id">
+type Toast = Omit<ToasterToast, "id"> & { open?: boolean; onOpenChange?: (open: boolean) => void; };
 
 function toast({ ...props }: Toast) {
   const id = genId()

@@ -1,7 +1,7 @@
 'use client';
 
 import type { PropsWithChildren } from 'react';
-import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
+import { SidebarProvider, SidebarInset } from '@/components/sidebar';
 import { SidebarNav } from '@/components/admin/sidebar-nav';
 import { Header } from '@/components/admin/header';
 

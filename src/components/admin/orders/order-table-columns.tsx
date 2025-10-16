@@ -1,38 +1,28 @@
 "use client";
 
+import { useState } from 'react';
 import type { ColumnDef } from '@tanstack/react-table';
 import { MoreHorizontal } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import type { Order } from '@/lib/types';
-import { DataTableColumnHeader } from '@/components/data-table/data-table-columns-header';
 
 export const columns: ColumnDef<Order>[] = [
   {
     id: 'select',
     header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && 'indeterminate')
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+      <input
+        type="checkbox"
+        className="h-4 w-4 shrink-0 rounded-sm border border-primary ring-offset-background data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground"
+        checked={table.getIsAllPageRowsSelected()}
+        onChange={(value) => table.toggleAllPageRowsSelected(!!value.target.checked)}
         aria-label="Select all"
       />
     ),
     cell: ({ row }) => (
-      <Checkbox
+      <input
+        type="checkbox"
+        className="h-4 w-4 shrink-0 rounded-sm border border-primary ring-offset-background data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground"
         checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
+        onChange={(value) => row.toggleSelected(!!value.target.checked)}
         aria-label="Select row"
       />
     ),
@@ -41,11 +31,11 @@ export const columns: ColumnDef<Order>[] = [
   },
   {
     accessorKey: 'id',
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Order ID" />,
+    header: 'Order ID',
   },
   {
     accessorKey: 'customer',
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Customer" />,
+    header: 'Customer',
     cell: ({ row }) => {
       const customer = row.getValue('customer') as Order['customer'];
       return <div>{customer.name}</div>;
@@ -53,7 +43,7 @@ export const columns: ColumnDef<Order>[] = [
   },
   {
     accessorKey: 'status',
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Status" />,
+    header: 'Status',
     cell: ({ row }) => {
         const status = row.getValue('status') as Order['status'];
         const variant: 'default' | 'secondary' | 'outline' | 'destructive' =
@@ -64,16 +54,25 @@ export const columns: ColumnDef<Order>[] = [
             : status === 'Processing'
             ? 'secondary'
             : 'destructive';
-        return <Badge variant={variant} className="capitalize">{status}</Badge>;
+        
+        const baseClasses = "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors";
+        const variantClasses = {
+            default: "border-transparent bg-primary text-primary-foreground",
+            secondary: "border-transparent bg-secondary text-secondary-foreground",
+            outline: "text-foreground",
+            destructive: "border-transparent bg-destructive text-destructive-foreground",
+        };
+
+        return <div className={`${baseClasses} ${variantClasses[variant]} capitalize`}>{status}</div>;
       },
   },
   {
     accessorKey: 'date',
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Date" />,
+    header: 'Date',
   },
   {
     accessorKey: 'total',
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Total" />,
+    header: 'Total',
     cell: ({ row }) => {
       const amount = parseFloat(row.getValue('total'));
       const formatted = new Intl.NumberFormat('en-US', {
@@ -86,23 +85,23 @@ export const columns: ColumnDef<Order>[] = [
   {
     id: 'actions',
     cell: ({ row }) => {
-      const order = row.original;
+      const [isOpen, setIsOpen] = useState(false);
       return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem>View order details</DropdownMenuItem>
-            <DropdownMenuItem>View customer</DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>Update Status</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className="relative">
+          <button onClick={() => setIsOpen(!isOpen)} className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium h-8 w-8 p-0 hover:bg-accent hover:text-accent-foreground">
+            <span className="sr-only">Open menu</span>
+            <MoreHorizontal className="h-4 w-4" />
+          </button>
+          {isOpen && (
+             <div className="absolute right-0 z-50 min-w-[8rem] overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-md animate-in fade-in-0 zoom-in-95">
+                <div className="px-2 py-1.5 text-sm font-semibold">Actions</div>
+                <div onClick={() => setIsOpen(false)} className="relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground">View order details</div>
+                <div onClick={() => setIsOpen(false)} className="relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground">View customer</div>
+                <hr className="-mx-1 my-1 h-px bg-muted" />
+                <div onClick={() => setIsOpen(false)} className="relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground">Update Status</div>
+          </div>
+          )}
+        </div>
       );
     },
   },

@@ -1,19 +1,9 @@
 'use client';
 
+import { useState } from 'react';
 import type { ColumnDef } from '@tanstack/react-table';
 import { MoreHorizontal } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import type { Customer } from '@/lib/types';
-import { DataTableColumnHeader } from '@/components/data-table/data-table-columns-header';
 
 export const columns = (
   onResetPassword: (email: string) => void
@@ -21,19 +11,23 @@ export const columns = (
   {
     id: 'select',
     header: ({ table }) => (
-      <Checkbox
+      <input
+        type="checkbox"
+        className="h-4 w-4 shrink-0 rounded-sm border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground"
         checked={
           table.getIsAllPageRowsSelected() ||
           (table.getIsSomePageRowsSelected() && 'indeterminate')
         }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+        onChange={(value) => table.toggleAllPageRowsSelected(!!value.target.checked)}
         aria-label="Select all"
       />
     ),
     cell: ({ row }) => (
-      <Checkbox
+      <input
+        type="checkbox"
+        className="h-4 w-4 shrink-0 rounded-sm border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground"
         checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
+        onChange={(value) => row.toggleSelected(!!value.target.checked)}
         aria-label="Select row"
       />
     ),
@@ -42,28 +36,20 @@ export const columns = (
   },
   {
     accessorKey: 'name',
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Name" />
-    ),
+    header: 'Name',
   },
   {
     accessorKey: 'email',
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Email" />
-    ),
+    header: 'Email',
   },
   {
     accessorKey: 'orders',
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Orders" />
-    ),
+    header: 'Orders',
     cell: ({ row }) => <div className="text-center">{row.getValue('orders')}</div>,
   },
   {
     accessorKey: 'totalSpent',
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Total Spent" />
-    ),
+    header: 'Total Spent',
     cell: ({ row }) => {
       const amount = parseFloat(row.getValue('totalSpent'));
       const formatted = new Intl.NumberFormat('en-US', {
@@ -77,24 +63,26 @@ export const columns = (
     id: 'actions',
     cell: ({ row }) => {
       const customer = row.original;
+      const [isOpen, setIsOpen] = useState(false);
+
       return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem>View profile</DropdownMenuItem>
-            <DropdownMenuItem>View order history</DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => onResetPassword(customer.email)}>
-              Send Password Reset
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className="relative">
+          <button onClick={() => setIsOpen(!isOpen)} className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-8 w-8 p-0">
+            <span className="sr-only">Open menu</span>
+            <MoreHorizontal className="h-4 w-4" />
+          </button>
+          {isOpen && (
+            <div className="absolute right-0 z-50 min-w-[8rem] overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-md animate-in fade-in-0 zoom-in-95">
+              <div className="px-2 py-1.5 text-sm font-semibold">Actions</div>
+              <div className="relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50" onClick={() => setIsOpen(false)}>View profile</div>
+              <div className="relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50" onClick={() => setIsOpen(false)}>View order history</div>
+              <hr className="-mx-1 my-1 h-px bg-muted" />
+              <div className="relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50" onClick={() => { onResetPassword(customer.email); setIsOpen(false); }}>
+                Send Password Reset
+              </div>
+            </div>
+          )}
+        </div>
       );
     },
   },
