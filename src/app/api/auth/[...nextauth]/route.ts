@@ -25,7 +25,7 @@ export const authOptions: AuthOptions = {
           .collection('users')
           .findOne({ email: credentials.email });
         if (!user) {
-          return null;
+          throw new Error("No user found with this email");
         }
 
         const isPasswordValid = await bcrypt.compare(
@@ -33,7 +33,7 @@ export const authOptions: AuthOptions = {
           user.password
         );
         if (!isPasswordValid) {
-          return null;
+          throw new Error("Incorrect password");
         }
 
         return { id: user._id.toString(), name: user.name, email: user.email };

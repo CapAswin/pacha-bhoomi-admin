@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from "react";
@@ -23,26 +22,25 @@ export default function LoginPage() {
         email,
         password,
       });
+
       if (res?.error) {
         toast({
           title: "Login Failed",
-          description: `Please check your credentials and try again.`,
+          description: "Invalid email or password. Please try again.",
           variant: "destructive",
         });
-      } else {
+      } else if (res?.ok) {
         toast({
           title: "Login Successful",
           description: `Welcome back!`,
         });
-
         router.push("/dashboard");
       }
     } catch (error) {
       console.error("SignIn error:", error);
-
       toast({
         title: "Login Failed",
-        description: "Please check your credentials and try again.",
+        description: "An unexpected error occurred. Please try again.",
         variant: "destructive",
       });
     }
