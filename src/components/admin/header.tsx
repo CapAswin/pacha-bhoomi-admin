@@ -4,24 +4,17 @@
 import Image from 'next/image';
 import { Search } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { signOut } from 'next-auth/react';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
-import { initializeFirebase } from '@/firebase';
 
 export function Header() {
   const userAvatar = PlaceHolderImages.find((img) => img.id === 'user-avatar-1');
   const router = useRouter();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const handleLogout = async () => {
-    try {
-      const { auth } = initializeFirebase();
-      await auth.signOut();
-      router.push('/');
-    } catch (error) {
-      console.error('Logout failed:', error);
-    }
+    await signOut({ redirect: false });
+    router.push('/');
   };
 
   return (
@@ -40,29 +33,22 @@ export function Header() {
       </div>
       <ThemeToggle />
       <div className="relative">
-        <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="rounded-full border-2 border-transparent focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
-            {userAvatar && (
-              <Image
-                src={userAvatar.imageUrl}
-                width={36}
-                height={36}
-                alt="User Avatar"
-                className="rounded-full"
-                data-ai-hint={userAvatar.imageHint}
-              />
-            )}
-            <span className="sr-only">Toggle user menu</span>
+        <button
+          onClick={handleLogout}
+          className="rounded-full border-2 border-transparent focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+        >
+          {userAvatar && (
+            <Image
+              src={userAvatar.imageUrl}
+              width={36}
+              height={36}
+              alt="User Avatar"
+              className="rounded-full"
+              data-ai-hint={userAvatar.imageHint}
+            />
+          )}
+          <span className="sr-only">Toggle user menu</span>
         </button>
-        {isMenuOpen && (
-            <div className="absolute right-0 mt-2 w-48 origin-top-right rounded-md bg-popover text-popover-foreground shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none py-1 animate-in fade-in-0 zoom-in-95 z-50" role="menu">
-                <div className="px-3 py-2 text-sm font-semibold" role="none">My Account</div>
-                <hr className="-mx-1 my-1 h-px bg-muted"/>
-                <a href="/settings" className="block px-3 py-2 text-sm text-popover-foreground hover:bg-accent rounded-sm" role="menuitem">Settings</a>
-                <a href="#" className="block px-3 py-2 text-sm text-popover-foreground hover:bg-accent rounded-sm" role="menuitem">Support</a>
-                <hr className="-mx-1 my-1 h-px bg-muted"/>
-                <a href="#" onClick={handleLogout} className="block px-3 py-2 text-sm text-popover-foreground hover:bg-accent rounded-sm" role="menuitem">Logout</a>
-            </div>
-        )}
       </div>
     </header>
   );
