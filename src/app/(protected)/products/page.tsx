@@ -71,7 +71,7 @@ export default function ProductsPage() {
 
   return (
     <>
-      <div className="border rounded-lg bg-card text-card-foreground shadow-sm glassmorphism mt-8">
+      <div className="border rounded-lg bg-card text-card-foreground shadow-sm glassmorphism mt-3">
         <div className="p-6">
           <h3 className="font-headline text-2xl font-semibold">Product List</h3>
           <p className="text-sm text-muted-foreground">
