@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { Product } from "@/lib/types";
 import { Textarea } from "@/components/ui/textarea";
-import { Bot } from "lucide-react";
+import { Bot, X } from "lucide-react";
 import {
   generateProductDescription,
   type GenerateProductDescriptionInput,
@@ -55,6 +55,21 @@ export function ProductForm({ onSubmit, initialData, onCancel }: ProductFormProp
     }
   }
 
+  const handleImageChange = (index: number, value: string) => {
+    const newImages = [...images];
+    newImages[index] = value;
+    setImages(newImages);
+  };
+
+  const addImageInput = () => {
+    setImages([...images, '']);
+  };
+
+  const removeImageInput = (index: number) => {
+    const newImages = images.filter((_, i) => i !== index);
+    setImages(newImages);
+  };
+
   return (
     <form onSubmit={handleSubmit} className="grid gap-6">
       <div className="grid gap-4 py-4">
@@ -68,13 +83,26 @@ export function ProductForm({ onSubmit, initialData, onCancel }: ProductFormProp
           />
         </div>
         <div className="space-y-2">
-          <label htmlFor="images">Image URL</label>
-          <Input
-            id="images"
-            value={images[0] || ""}
-            onChange={(e) => setImages([e.target.value])}
-            placeholder="Image URL"
-          />
+          <label>Image URLs</label>
+          {images.map((image, index) => (
+            <div key={index} className="flex items-center gap-2">
+              <Input
+                value={image}
+                onChange={(e) => handleImageChange(index, e.target.value)}
+                placeholder="Image URL"
+              />
+              <Button type="button" variant="outline" size="icon" onClick={() => removeImageInput(index)}>
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          ))}
+          <Button
+            type="button"
+            variant="outline"
+            onClick={addImageInput}
+          >
+            Add Image URL
+          </Button>
         </div>
         <div className="space-y-2">
           <label htmlFor="description">Description</label>

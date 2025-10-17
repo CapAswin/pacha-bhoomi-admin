@@ -11,11 +11,11 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
     try {
         const db = await getDb();
         const productData = await request.json();
-        const { name, description, price, stock } = productData;
+        const { name, description, price, stock, images } = productData;
 
         const result = await db.collection('products').updateOne(
             { _id: new ObjectId(params.id) },
-            { $set: { name, description, price, stock } }
+            { $set: { name, description, price, stock, images } }
         );
 
         if (result.matchedCount === 0) {

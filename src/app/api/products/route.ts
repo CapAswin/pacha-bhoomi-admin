@@ -11,7 +11,7 @@ const initialProducts: Omit<Product, 'id' | '_id'>[] = Array.from({ length: 15 }
   status: ['in stock', 'low stock', 'out of stock'][Math.floor(Math.random() * 3)] as 'in stock' | 'low stock' | 'out of stock',
   description: `Description for product ${String.fromCharCode(65 + i)}`,
   images: ['/placeholder.svg'],
-  createdAt: new Date().toISOString(), // ✅ Convert to string
+  createdAt: new Date().toISOString(),
 }));
 
 
@@ -56,8 +56,9 @@ export async function POST(request: Request) {
             : 'out of stock',
           description: productData.description,
           images: [productData.imageUrl || '/placeholder.svg'],
-          createdAt: new Date().toISOString(), // ✅ Convert Date to string
+          createdAt: new Date().toISOString(),
         };
+        
         
 
         const result = await db.collection('products').insertOne(newProduct as any);
