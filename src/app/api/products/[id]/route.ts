@@ -7,22 +7,6 @@ async function getDb() {
     return client.db('authdb');
 }
 
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
-    try {
-        const db = await getDb();
-        const product = await db.collection('products').findOne({ _id: new ObjectId(params.id) });
-        if (!product) {
-            return new NextResponse('Product not found', { status: 404 });
-        }
-        // Return a consistent product shape with a string id
-        const { _id, ...productData } = product;
-        return NextResponse.json({ id: _id.toHexString(), ...productData });
-    } catch (error) {
-        console.error('Failed to fetch product:', error);
-        return new NextResponse('Internal Server Error', { status: 500 });
-    }
-}
-
 export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
     try {
         const db = await getDb();

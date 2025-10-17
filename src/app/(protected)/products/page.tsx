@@ -39,6 +39,16 @@ export default function ProductsPage() {
     isError,
   } = useQuery<Product[]>({ queryKey: ["products"], queryFn: fetchProducts });
 
+  const sortedProducts = React.useMemo(() => {
+    if (!Array.isArray(productList)) return [];
+  
+    return [...productList].sort((a, b) => {
+      const dateA = a?.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const dateB = b?.createdAt ? new Date(b.createdAt).getTime() : 0;
+      return dateB - dateA;
+    });
+  }, [productList]);
+
   const addMutation = useMutation({
     mutationFn: addProduct,
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["products"] }),
@@ -76,7 +86,7 @@ export default function ProductsPage() {
           ) : (
             <ProductTable
               columns={columns}
-              data={productList}
+              data={sortedProducts}
               onAddProduct={handleAddProduct}
               onDeleteProduct={handleDeleteProduct}
             />

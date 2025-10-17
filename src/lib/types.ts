@@ -1,13 +1,14 @@
 import { ObjectId } from 'mongodb';
 
 export type Product = {
-  id: string; // Unique identifier, consistently used across the app
+  id: string;
   name: string;
   price: number;
   stock: number;
   status: 'in stock' | 'low stock' | 'out of stock';
   description: string;
   images: string[];
+  createdAt: string; // 👈 Add this
 };
 
 export type Order = {
