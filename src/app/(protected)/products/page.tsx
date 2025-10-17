@@ -3,7 +3,7 @@ import React from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Product } from "@/lib/types";
 import { ProductTable } from "@/components/admin/products/product-table";
-import { columns as defineColumns } from "@/components/admin/products/product-table-columns";
+import { columns } from "@/components/admin/products/product-table-columns";
 import { ProductTableSkeleton } from "@/components/admin/products/product-table-skeleton";
 
 async function fetchProducts(): Promise<Product[]> {
@@ -38,8 +38,6 @@ export default function ProductsPage() {
       await deleteMutation.mutateAsync(productId);
     }
   };
-
-  const columns = defineColumns;
 
   return (
     <>
