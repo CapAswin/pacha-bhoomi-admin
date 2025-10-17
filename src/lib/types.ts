@@ -1,5 +1,6 @@
 export type Product = {
-  id: string;
+  _id?: string; // MongoDB's default unique identifier
+  id?: string; // Keep for frontend compatibility, but it's optional
   name: string;
   price: number;
   stock: number;
