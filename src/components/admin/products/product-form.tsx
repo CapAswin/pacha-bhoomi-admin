@@ -1,4 +1,5 @@
-"use client";
+'use client';
+
 import React, { useState } from "react";
 import { Product } from "@/lib/types";
 import { Textarea } from "@/components/ui/textarea";
@@ -21,9 +22,10 @@ export type ProductFormValues = {
 interface ProductFormProps {
   onSubmit: (values: ProductFormValues) => void;
   initialData?: Product | null;
+  onCancel?: () => void;
 }
 
-export function ProductForm({ onSubmit, initialData }: ProductFormProps) {
+export function ProductForm({ onSubmit, initialData, onCancel }: ProductFormProps) {
   const [name, setName] = useState(initialData?.name || "");
   const [description, setDescription] = useState(
     initialData?.description || ""
@@ -35,12 +37,6 @@ export function ProductForm({ onSubmit, initialData }: ProductFormProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSubmit({ name, description, price, stock, images });
-    // Reset form fields after submission
-    setName("");
-    setDescription("");
-    setPrice(0);
-    setStock(0);
-    setImages([]);
   };
 
   async function handleGenerateDescription() {
@@ -124,8 +120,13 @@ export function ProductForm({ onSubmit, initialData }: ProductFormProps) {
         </div>
       </div>
 
-      <div className="flex justify-end">
-        <Button type="submit">Add Product</Button>
+      <div className="flex justify-end gap-2">
+        {onCancel && (
+            <Button type="button" variant="outline" onClick={onCancel}>
+              Cancel
+            </Button>
+        )}
+        <Button type="submit">{initialData ? 'Save Changes' : 'Create Product'}</Button>
       </div>
     </form>
   );
