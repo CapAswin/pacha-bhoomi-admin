@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import * as React from 'react';
 import {
@@ -8,11 +8,20 @@ import {
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
-  getPaginationRowModel,
+  getPaginationRowModel, // Make sure this is imported
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table';
 import { DataTablePagination } from '@/components/data-table/data-table-pagination';
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+  } from '@/components/ui/table';
+  import { Input } from '@/components/ui/input';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -31,7 +40,7 @@ export function ProductTable<TData, TValue>({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
+    getPaginationRowModel: getPaginationRowModel(), // This is crucial for pagination
     onSortingChange: setSorting,
     getSortedRowModel: getSortedRowModel(),
     onColumnFiltersChange: setColumnFilters,
@@ -47,67 +56,64 @@ export function ProductTable<TData, TValue>({
   return (
     <div className="space-y-4">
       <div className="flex items-center">
-        <input
+        <Input
           placeholder="Filter products..."
           value={(table.getColumn('name')?.getFilterValue() as string) ?? ''}
           onChange={(event) =>
             table.getColumn('name')?.setFilterValue(event.target.value)
           }
-          className="max-w-sm flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base md:text-sm"
+          className="max-w-sm"
         />
       </div>
       <div className="rounded-md border">
-        <div className="relative w-full overflow-auto">
-            <table className="w-full caption-bottom text-sm">
-                <thead className="[&_tr]:border-b">
-                    {table.getHeaderGroups().map((headerGroup) => (
-                    <tr key={headerGroup.id} className="border-b transition-colors hover:bg-muted/50">
-                        {headerGroup.headers.map((header) => {
-                        return (
-                            <th key={header.id} className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">
-                            {header.isPlaceholder
-                                ? null
-                                : flexRender(
-                                    header.column.columnDef.header,
-                                    header.getContext()
-                                )}
-                            </th>
-                        );
-                        })}
-                    </tr>
-                    ))}
-                </thead>
-                <tbody className="[&_tr:last-child]:border-0">
-                    {table.getRowModel().rows?.length ? (
-                    table.getRowModel().rows.map((row) => (
-                        <tr
-                        key={row.id}
-                        data-state={row.getIsSelected() && 'selected'}
-                        className="border-b transition-colors hover:bg-muted/50"
-                        >
-                        {row.getVisibleCells().map((cell) => (
-                            <td key={cell.id} className="p-4 align-middle">
-                            {flexRender(
-                                cell.column.columnDef.cell,
-                                cell.getContext()
-                            )}
-                            </td>
-                        ))}
-                        </tr>
-                    ))
-                    ) : (
-                    <tr>
-                        <td
-                        colSpan={columns.length}
-                        className="h-24 text-center p-4 align-middle"
-                        >
-                        No results.
-                        </td>
-                    </tr>
-                    )}
-                </tbody>
-            </table>
-        </div>
+        <Table>
+          <TableHeader>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map((header) => {
+                  return (
+                    <TableHead key={header.id}>
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                    </TableHead>
+                  );
+                })}
+              </TableRow>
+            ))}
+          </TableHeader>
+          <TableBody>
+            {table.getRowModel().rows?.length ? (
+              table.getRowModel().rows.map((row) => (
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && 'selected'}
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id}>
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center"
+                >
+                  No results.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
       </div>
       <DataTablePagination table={table} />
     </div>
