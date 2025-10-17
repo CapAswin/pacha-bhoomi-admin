@@ -21,7 +21,6 @@ const navItems = [
   { href: '/products', icon: Package, label: 'Products' },
   { href: '/customers', icon: Users, label: 'Customers' },
   { href: '/promotions', icon: TicketPercent, label: 'Promotions' },
-  { href: '/loader-test', icon: TestTube, label: 'Loader Test' },
 ];
 
 function cn(...classes: (string | boolean | undefined)[]) {
