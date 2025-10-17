@@ -10,7 +10,7 @@ const initialProducts: Omit<Product, 'id' | '_id'>[] = Array.from({ length: 15 }
   stock: Math.floor(Math.random() * 200) + 1,
   status: ['in stock', 'low stock', 'out of stock'][Math.floor(Math.random() * 3)] as 'in stock' | 'low stock' | 'out of stock',
   description: `Description for product ${String.fromCharCode(65 + i)}`,
-  images: ['/placeholder.svg'],
+  images: [''],
   createdAt: new Date().toISOString(),
 }));
 
