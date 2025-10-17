@@ -5,13 +5,15 @@ import { ObjectId } from 'mongodb';
 import type { Product } from '@/lib/types';
 
 const initialProducts: Omit<Product, 'id' | '_id'>[] = Array.from({ length: 15 }, (_, i) => ({
-    name: `Product ${String.fromCharCode(65 + i)}`,
-    price: Math.floor(Math.random() * 200) + 50,
-    stock: Math.floor(Math.random() * 200) + 1,
-    status: ['in stock', 'low stock', 'out of stock'][Math.floor(Math.random() * 3)] as 'in stock' | 'low stock' | 'out of stock',
-    description: `Description for product ${String.fromCharCode(65 + i)}`,
-    images: ['/placeholder.svg'],
-  }));
+  name: `Product ${String.fromCharCode(65 + i)}`,
+  price: Math.floor(Math.random() * 200) + 50,
+  stock: Math.floor(Math.random() * 200) + 1,
+  status: ['in stock', 'low stock', 'out of stock'][Math.floor(Math.random() * 3)] as 'in stock' | 'low stock' | 'out of stock',
+  description: `Description for product ${String.fromCharCode(65 + i)}`,
+  images: ['/placeholder.svg'],
+  createdAt: new Date().toISOString(), // ✅ Convert to string
+}));
+
 
 async function getDb() {
     const client = await clientPromise;
@@ -46,13 +48,17 @@ export async function POST(request: Request) {
         const productData = await request.json();
 
         const newProduct: Omit<Product, 'id' | '_id'> = {
-            name: productData.name,
-            price: productData.price,
-            stock: productData.stock,
-            status: productData.stock > 0 ? (productData.stock < 50 ? 'low stock' : 'in stock') : 'out of stock',
-            description: productData.description,
-            images: [productData.imageUrl || '/placeholder.svg'],
+          name: productData.name,
+          price: productData.price,
+          stock: productData.stock,
+          status: productData.stock > 0 
+            ? (productData.stock < 50 ? 'low stock' : 'in stock') 
+            : 'out of stock',
+          description: productData.description,
+          images: [productData.imageUrl || '/placeholder.svg'],
+          createdAt: new Date().toISOString(), // ✅ Convert Date to string
         };
+        
 
         const result = await db.collection('products').insertOne(newProduct as any);
         const insertedProduct = { ...newProduct, id: result.insertedId.toString() };

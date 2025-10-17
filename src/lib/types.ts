@@ -8,7 +8,7 @@ export type Product = {
   status: 'in stock' | 'low stock' | 'out of stock';
   description: string;
   images: string[];
-  createdAt: string; // 👈 Add this
+  createdAt: string;
 };
 
 export type Order = {

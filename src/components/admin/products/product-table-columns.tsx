@@ -58,7 +58,14 @@ export const columns: ColumnDef<Product>[] = [
       </button>
     ),
     cell: ({ row }) => {
-      const date = new Date(row.getValue('createdAt'));
+      const createdAt = row.getValue('createdAt');
+      if (!createdAt) {
+        return <div>-</div>;
+      }
+      const date = new Date(createdAt as string);
+      if (isNaN(date.getTime())) {
+        return <div>-</div>;
+      }
       const formattedDate = new Intl.DateTimeFormat('en-US').format(date);
       return <div>{formattedDate}</div>;
     },
