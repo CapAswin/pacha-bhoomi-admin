@@ -1,54 +1,42 @@
 
-import { promises as fs } from 'fs';
-import path from 'path';
 import { NextResponse } from 'next/server';
-import { z } from 'zod';
-import { categorySchema } from '@/lib/types';
+import clientPromise from '@/lib/mongodb';
+import { ObjectId } from 'mongodb';
+import type { Category } from '@/lib/types';
 
-const jsonPath = path.join(process.cwd(), 'src/lib/categories.json');
-
-async function readCategories() {
-  try {
-    const data = await fs.readFile(jsonPath, 'utf-8');
-    const jsonData = JSON.parse(data);
-    return jsonData.categories || [];
-  } catch (error) {
-    // Type-safe check for Node.js file errors
-    if (error instanceof Error && 'code' in error && (error as any).code === 'ENOENT') {
-      return [];
-    }
-    throw error;
-  }
-}
-
-async function writeCategories(categories: any) {
-  await fs.writeFile(jsonPath, JSON.stringify({ categories }, null, 2));
+async function getDb() {
+    const client = await clientPromise;
+    return client.db('authdb');
 }
 
 export async function GET() {
-  const categories = await readCategories();
-  return NextResponse.json(categories);
+  try {
+    const db = await getDb();
+    const categories = await db.collection('categories').find({}).toArray();
+    const formattedCategories = categories.map(c => ({ ...c, id: c._id.toString(), _id: undefined }));
+    return NextResponse.json(formattedCategories);
+  } catch (error) {
+    console.error('Error fetching categories:', error);
+    return NextResponse.json({ message: 'Error fetching categories' }, { status: 500 });
+  }
 }
 
 export async function POST(request: Request) {
-  const newCategoryData = await request.json();
-  try {
-    const parsedCategory = categorySchema.omit({ id: true }).parse(newCategoryData);
-    const categories = await readCategories();
+    try {
+        const db = await getDb();
+        const categoryData = await request.json();
 
-    const newCategory = {
-      id: `cat-${new Date().getTime()}`,
-      ...parsedCategory,
-    };
+        const newCategory: Omit<Category, 'id' | '_id'> = {
+          name: categoryData.name,
+          description: categoryData.description,
+        };
 
-    categories.push(newCategory);
-    await writeCategories(categories);
+        const result = await db.collection('categories').insertOne(newCategory as any);
+        const insertedCategory = { ...newCategory, id: result.insertedId.toString() };
 
-    return NextResponse.json(newCategory, { status: 201 });
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      return NextResponse.json({ error: error.issues }, { status: 400 });
+        return NextResponse.json(insertedCategory, { status: 201 });
+    } catch (error) {
+        console.error('Error adding category:', error);
+        return NextResponse.json({ message: 'Error adding category' }, { status: 500 });
     }
-    return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
-  }
 }
