@@ -3,6 +3,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { FirebaseClientProvider } from "@/firebase";
 import "./globals.css";
 import ClientSessionProvider from "./session-provider";
+import { ModalProvider } from "@/context/modal-context";
 
 export const metadata: Metadata = {
   title: "Pacha Bhoomi Admin",
@@ -36,7 +37,11 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <ClientSessionProvider>
-            <FirebaseClientProvider>{children}</FirebaseClientProvider>
+            <FirebaseClientProvider>
+              <ModalProvider>
+                {children}
+              </ModalProvider>
+            </FirebaseClientProvider>
           </ClientSessionProvider>
         </ThemeProvider>
       </body>

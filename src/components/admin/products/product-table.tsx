@@ -3,11 +3,9 @@
 import * as React from 'react';
 import {
   type ColumnDef,
-  type ColumnFiltersState,
   type SortingState,
   flexRender,
   getCoreRowModel,
-  getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
@@ -21,52 +19,68 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { CreateProductModal } from './create-product-modal';
+import { ProductActions } from './product-actions';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
 }
 
-export function ProductTable<TData, TValue>({
+export function ProductTable<TData extends { id: string }, TValue>({
   columns,
-  data,
+  data: initialData,
 }: DataTableProps<TData, TValue>) {
   const [isModalOpen, setIsModalOpen] = React.useState(false);
+  const [products, setProducts] = React.useState(initialData);
   const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [rowSelection, setRowSelection] = React.useState({});
 
+  const addProduct = (product: { name: string; price: number; description: string }) => {
+    const newProduct = {
+        ...product,
+        id: `product-${products.length + 1}`,
+        // You can add other default fields here
+    } as TData;
+    setProducts(prevProducts => [...prevProducts, newProduct]);
+  };
+
+  const augmentedColumns = React.useMemo(
+    () => [
+      ...columns,
+      {
+        id: 'actions',
+        cell: ({ row }) => (
+          <ProductActions 
+            onEdit={() => console.log('Edit', row.original)} 
+            onDelete={() => {
+              setProducts(prev => prev.filter(p => p.id !== (row.original as TData).id));
+            }}
+          />
+        ),
+      },
+    ],
+    [columns, products]
+  );
+
   const table = useReactTable({
-    data,
-    columns,
+    data: products,
+    columns: augmentedColumns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     onSortingChange: setSorting,
     getSortedRowModel: getSortedRowModel(),
-    onColumnFiltersChange: setColumnFilters,
-    getFilteredRowModel: getFilteredRowModel(),
     onRowSelectionChange: setRowSelection,
     state: {
       sorting,
-      columnFilters,
       rowSelection,
     },
   });
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <Input
-          placeholder="Filter products..."
-          value={(table.getColumn('name')?.getFilterValue() as string) ?? ''}
-          onChange={(event) =>
-            table.getColumn('name')?.setFilterValue(event.target.value)
-          }
-          className="max-w-sm"
-        />
+      <div className="flex items-center justify-end">
         <Button onClick={() => setIsModalOpen(true)}>Create Product</Button>
       </div>
       <div className="border rounded-lg bg-card text-card-foreground shadow-sm glassmorphism mt-4">
@@ -110,7 +124,7 @@ export function ProductTable<TData, TValue>({
               ) : (
                 <TableRow>
                   <TableCell
-                    colSpan={columns.length}
+                    colSpan={augmentedColumns.length}
                     className="h-24 text-center"
                   >
                     No results.
@@ -125,6 +139,7 @@ export function ProductTable<TData, TValue>({
       <CreateProductModal 
         isOpen={isModalOpen} 
         onClose={() => setIsModalOpen(false)} 
+        onSave={addProduct}
       />
     </div>
   );

@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -8,12 +8,30 @@ import { Textarea } from '@/components/ui/textarea';
 interface CreateProductModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onSave: (product: { name: string; price: number; description: string }) => void;
 }
 
-export function CreateProductModal({ isOpen, onClose }: CreateProductModalProps) {
+export function CreateProductModal({ isOpen, onClose, onSave }: CreateProductModalProps) {
+  const [name, setName] = useState('');
+  const [price, setPrice] = useState('');
+  const [description, setDescription] = useState('');
+
   if (!isOpen) {
     return null;
   }
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSave({
+      name,
+      price: parseFloat(price) || 0,
+      description,
+    });
+    setName('');
+    setPrice('');
+    setDescription('');
+    onClose();
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm">
@@ -27,20 +45,20 @@ export function CreateProductModal({ isOpen, onClose }: CreateProductModalProps)
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
         </button>
 
-        <form className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Product Name</label>
-            <Input id="name" placeholder="Enter product name" className="mt-1" />
+            <Input id="name" placeholder="Enter product name" className="mt-1" value={name} onChange={e => setName(e.target.value)} />
           </div>
 
           <div>
             <label htmlFor="price" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Price</label>
-            <Input id="price" type="number" placeholder="0.00" className="mt-1" />
+            <Input id="price" type="number" placeholder="0.00" className="mt-1" value={price} onChange={e => setPrice(e.target.value)} />
           </div>
 
           <div>
             <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Description</label>
-            <Textarea id="description" placeholder="Enter product description" className="mt-1" />
+            <Textarea id="description" placeholder="Enter product description" className="mt-1" value={description} onChange={e => setDescription(e.target.value)} />
           </div>
 
           <div className="flex justify-end space-x-4 pt-4">
