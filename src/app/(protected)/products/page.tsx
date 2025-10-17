@@ -39,7 +39,7 @@ export default function ProductsPage() {
     }
   };
 
-  const columns = defineColumns();
+  const columns = defineColumns;
 
   return (
     <>
