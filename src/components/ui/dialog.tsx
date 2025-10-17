@@ -3,9 +3,9 @@
 import * as React from 'react'
 import * as ReactDOM from 'react-dom'
 import { X } from 'lucide-react'
-
 import { cn } from '@/lib/utils'
 
+/* -------------------- Context -------------------- */
 interface DialogContextType {
   isOpen: boolean
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>
@@ -13,16 +13,32 @@ interface DialogContextType {
 
 const DialogContext = React.createContext<DialogContextType | null>(null)
 
-const useDialog = () => {
+function useDialog() {
   const context = React.useContext(DialogContext)
   if (!context) {
-    throw new Error('useDialog must be used within a Dialog')
+    throw new Error('useDialog must be used within a <Dialog>')
   }
   return context
 }
 
-const Dialog = ({ children }: { children: React.ReactNode }) => {
-  const [isOpen, setIsOpen] = React.useState(false)
+/* -------------------- Root Dialog -------------------- */
+interface DialogProps {
+  children: React.ReactNode
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
+}
+
+const Dialog = ({ children, open, onOpenChange }: DialogProps) => {
+  const [internalOpen, setInternalOpen] = React.useState(false)
+  const isControlled = open !== undefined
+  const isOpen = isControlled ? open : internalOpen
+
+  const setIsOpen: React.Dispatch<React.SetStateAction<boolean>> = (value) => {
+    const newOpen = typeof value === 'function' ? value(isOpen) : value
+    if (!isControlled) setInternalOpen(newOpen)
+    onOpenChange?.(newOpen)
+  }
+
   return (
     <DialogContext.Provider value={{ isOpen, setIsOpen }}>
       {children}
@@ -31,79 +47,81 @@ const Dialog = ({ children }: { children: React.ReactNode }) => {
 }
 Dialog.displayName = 'Dialog'
 
-const DialogTrigger = ({ children, asChild = false }: { children: React.ReactNode, asChild?: boolean }) => {
+/* -------------------- Trigger & Close -------------------- */
+interface DialogButtonProps {
+  children: React.ReactNode
+  asChild?: boolean
+}
+
+const DialogTrigger = ({ children, asChild = false }: DialogButtonProps) => {
   const { setIsOpen } = useDialog()
-  const handleClick = () => setIsOpen(true);
 
   if (asChild && React.isValidElement(children)) {
-    return React.cloneElement(children, {
-      onClick: () => {
-        if (children.props.onClick) {
-          children.props.onClick();
-        }
-        handleClick();
-      },
-    })
-  }
+  const child = children as React.ReactElement
+  return React.cloneElement(child, {
+    onClick: (e: React.MouseEvent) => {
+      child.props.onClick?.(e)
+      setIsOpen(true)
+    },
+  })
+}
 
-  return (
-    <button onClick={handleClick}>
-      {children}
-    </button>
-  )
+
+  return <button onClick={() => setIsOpen(true)}>{children}</button>
 }
 DialogTrigger.displayName = 'DialogTrigger'
 
-const DialogPortal = ({ children }: { children: React.ReactNode }) => {
-    const [mounted, setMounted] = React.useState(false)
+const DialogClose = ({ children, asChild = false }: DialogButtonProps) => {
+  const { setIsOpen } = useDialog()
 
-    React.useEffect(() => {
-        setMounted(true)
-        return () => setMounted(false)
-    }, [])
+  if (asChild && React.isValidElement(children)) {
+    const child = children as React.ReactElement
+    return React.cloneElement(child, {
+      onClick: (e: React.MouseEvent) => {
+        child.props.onClick?.(e)
+        setIsOpen(true)
+      },
+    })
+  }
+  
 
-    return mounted
-        ? ReactDOM.createPortal(children, document.body)
-        : null
-}
-DialogPortal.displayName = 'DialogPortal'
-
-
-const DialogClose = ({ children, asChild = false }: { children: React.ReactNode, asChild?: boolean }) => {
-    const { setIsOpen } = useDialog();
-    const handleClick = () => setIsOpen(false);
-
-    if (asChild && React.isValidElement(children)) {
-        return React.cloneElement(children, {
-             onClick: () => {
-                if (children.props.onClick) {
-                    children.props.onClick();
-                }
-                handleClick();
-            },
-        });
-    }
-    return (
-        <button onClick={handleClick}>
-            {children}
-        </button>
-    )
+  return <button onClick={() => setIsOpen(false)}>{children}</button>
 }
 DialogClose.displayName = 'DialogClose'
 
+/* -------------------- Portal -------------------- */
+const DialogPortal = ({ children }: { children: React.ReactNode }) => {
+  const [mounted, setMounted] = React.useState(false)
+
+  React.useEffect(() => {
+    setMounted(true)
+    return () => setMounted(false)
+  }, [])
+
+  return mounted ? ReactDOM.createPortal(children, document.body) : null
+}
+DialogPortal.displayName = 'DialogPortal'
+
+/* -------------------- Overlay & Content -------------------- */
 const DialogOverlay = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => (
-  <div
-    ref={ref}
-    className={cn(
-      'fixed inset-0 z-50 bg-black/80 transition-opacity duration-300 ease-in-out',
-      className
-    )}
-    {...props}
-  />
-))
+>(({ className, ...props }, ref) => {
+  const { isOpen, setIsOpen } = useDialog()
+  if (!isOpen) return null
+
+  return (
+    <div
+      ref={ref}
+      onClick={() => setIsOpen(false)}
+      className={cn(
+        'fixed inset-0 z-50 bg-black/80 transition-opacity duration-300 ease-in-out',
+        className
+      )}
+      {...props}
+    />
+  )
+})
 DialogOverlay.displayName = 'DialogOverlay'
 
 const DialogContent = React.forwardRef<
@@ -114,25 +132,21 @@ const DialogContent = React.forwardRef<
 
   React.useEffect(() => {
     const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        setIsOpen(false)
-      }
+      if (event.key === 'Escape') setIsOpen(false)
     }
     document.addEventListener('keydown', handleEscape)
     return () => document.removeEventListener('keydown', handleEscape)
   }, [setIsOpen])
 
-  if (!isOpen) {
-    return null
-  }
+  if (!isOpen) return null
 
   return (
     <DialogPortal>
-      <DialogOverlay onClick={() => setIsOpen(false)} />
+      <DialogOverlay />
       <div
         ref={ref}
         className={cn(
-          'fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg sm:rounded-lg',
+          'fixed left-1/2 top-1/2 z-50 grid w-full max-w-lg -translate-x-1/2 -translate-y-1/2 gap-4 border bg-background p-6 shadow-lg sm:rounded-lg',
           'transition-all duration-300 ease-in-out',
           isOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-95',
           className
@@ -154,19 +168,14 @@ const DialogContent = React.forwardRef<
 })
 DialogContent.displayName = 'DialogContent'
 
+/* -------------------- Header / Footer / Title -------------------- */
 const DialogHeader = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
-  <div
-    className={cn('flex flex-col space-y-1.5 text-center sm:text-left', className)}
-    {...props}
-  />
+  <div className={cn('flex flex-col space-y-1.5 text-center sm:text-left', className)} {...props} />
 )
 DialogHeader.displayName = 'DialogHeader'
 
 const DialogFooter = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
-  <div
-    className={cn('flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2', className)}
-    {...props}
-  />
+  <div className={cn('flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2', className)} {...props} />
 )
 DialogFooter.displayName = 'DialogFooter'
 
@@ -174,11 +183,7 @@ const DialogTitle = React.forwardRef<
   HTMLHeadingElement,
   React.HTMLAttributes<HTMLHeadingElement>
 >(({ className, ...props }, ref) => (
-  <h2
-    ref={ref}
-    className={cn('text-lg font-semibold leading-none tracking-tight', className)}
-    {...props}
-  />
+  <h2 ref={ref} className={cn('text-lg font-semibold leading-none tracking-tight', className)} {...props} />
 ))
 DialogTitle.displayName = 'DialogTitle'
 
@@ -186,14 +191,11 @@ const DialogDescription = React.forwardRef<
   HTMLParagraphElement,
   React.HTMLAttributes<HTMLParagraphElement>
 >(({ className, ...props }, ref) => (
-  <p
-    ref={ref}
-    className={cn('text-sm text-muted-foreground', className)}
-    {...props}
-  />
+  <p ref={ref} className={cn('text-sm text-muted-foreground', className)} {...props} />
 ))
 DialogDescription.displayName = 'DialogDescription'
 
+/* -------------------- Exports -------------------- */
 export {
   Dialog,
   DialogTrigger,
@@ -204,4 +206,5 @@ export {
   DialogDescription,
   DialogPortal,
   DialogClose,
+  DialogOverlay,
 }
