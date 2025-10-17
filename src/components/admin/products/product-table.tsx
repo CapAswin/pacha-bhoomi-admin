@@ -99,7 +99,7 @@ export function ProductTable<TData extends { id: string }, TValue>({
           Create Product
         </Button>
       </div>
-      <div className="border rounded-lg bg-card text-card-foreground shadow-sm glassmorphism mt-4">
+      <div className="border rounded-lg bg-card text-card-foreground shadow-sm glassmorphism ">
         <div className="relative w-full overflow-auto max-h-[60vh]">
           <Table>
             <TableHeader>
