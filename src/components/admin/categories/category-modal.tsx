@@ -11,14 +11,20 @@ interface CategoryModalProps {
 }
 
 export function CategoryModal({ onCreate, onEdit }: CategoryModalProps) {
-  const { modal, closeModal, data } = useModal();
+  const { modal, closeModal } = useModal();
 
-  const isCreateModal = modal === 'createCategory';
-  const isEditModal = modal === 'editCategory';
+  const isCreateModal = modal?.type === 'createCategory';
+  const isEditModal = modal?.type === 'editCategory';
+
+  if (!isCreateModal && !isEditModal) {
+    return null;
+  }
+
+  const categoryToEdit = isEditModal ? (modal.data as { category: Category })?.category : undefined;
 
   const handleSubmit = (values: Omit<Category, 'id'>) => {
-    if (isEditModal && data?.category) {
-      onEdit(data.category.id, values);
+    if (isEditModal && categoryToEdit) {
+      onEdit(categoryToEdit.id, values);
     } else {
       onCreate(values);
     }
@@ -34,7 +40,7 @@ export function CategoryModal({ onCreate, onEdit }: CategoryModalProps) {
         <CategoryForm
           onSubmit={handleSubmit}
           onCancel={closeModal}
-          initialData={isEditModal ? data.category : null}
+          initialData={categoryToEdit}
         />
       </DialogContent>
     </Dialog>
