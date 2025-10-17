@@ -8,6 +8,7 @@ import {
   ChevronsRight,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { DataTableRowsPerPageOption } from '@/components/data-table/data-table-rows-per-page-option';
 
 interface DataTablePaginationProps<TData> {
   table: Table<TData>;
@@ -23,6 +24,7 @@ export function DataTablePagination<TData>({
         {table.getFilteredRowModel().rows.length} row(s) selected.
       </div>
       <div className="flex items-center space-x-6 lg:space-x-8">
+        <DataTableRowsPerPageOption table={table} />
         <div className="flex w-[100px] items-center justify-center text-sm font-medium">
           Page {table.getState().pagination.pageIndex + 1} of{' '}
           {table.getPageCount()}
