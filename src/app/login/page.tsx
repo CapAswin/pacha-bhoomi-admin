@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect } from "react";
@@ -18,10 +17,10 @@ export default function LoginPage() {
     const error = searchParams.get("error");
     if (error === "CredentialsSignin") {
       // Clean the URL
-      router.replace('/login', {scroll: false});
-    } else if(searchParams.get("callbackUrl")) {
-        // Clean the URL
-        router.replace('/login', {scroll: false});
+      router.replace("/login", { scroll: false });
+    } else if (searchParams.get("callbackUrl")) {
+      // Clean the URL
+      router.replace("/login", { scroll: false });
     }
   }, [searchParams, router]);
 
@@ -34,8 +33,9 @@ export default function LoginPage() {
     });
 
     if (res?.error) {
-      console.error("Login Failed: Invalid email or password.");
+      alert(`Login Failed: ${res.error}`);
     } else if (res?.ok) {
+      alert("Login Successful!");
       router.push("/dashboard");
     }
   };
