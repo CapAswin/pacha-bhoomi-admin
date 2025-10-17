@@ -1,3 +1,4 @@
+
 import NextAuth from 'next-auth';
 import type { AuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
@@ -32,6 +33,10 @@ export const authOptions: AuthOptions = {
         );
         if (!isPasswordValid) {
           throw new Error('Incorrect password.');
+        }
+
+        if (user.role !== 'admin') {
+          throw new Error('Access denied. Only admins can log in.');
         }
 
         return { id: user._id.toString(), name: user.name, email: user.email };
