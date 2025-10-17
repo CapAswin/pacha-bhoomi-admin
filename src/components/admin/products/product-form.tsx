@@ -1,62 +1,131 @@
-'use client';
+"use client";
+import React, { useState } from "react";
+import { Product } from "@/lib/types";
+import { Textarea } from "@/components/ui/textarea";
+import { Bot } from "lucide-react";
+import {
+  generateProductDescription,
+  type GenerateProductDescriptionInput,
+} from "@/ai/ai-product-description";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
-import React, { useState } from 'react';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-
-export interface ProductFormData {
+export type ProductFormValues = {
   name: string;
-  price: number;
   description: string;
-}
+  price: number;
+  stock: number;
+  images: string[];
+};
 
 interface ProductFormProps {
-  onSubmit: (data: ProductFormData) => void;
-  initialData?: Partial<ProductFormData>;
-  onCancel?: () => void;
+  onSubmit: (values: ProductFormValues) => void;
+  initialData?: Product | null;
 }
 
-export function ProductForm({ onSubmit, initialData, onCancel }: ProductFormProps) {
-  const [name, setName] = useState(initialData?.name || '');
-  const [price, setPrice] = useState(initialData?.price?.toString() || '');
-  const [description, setDescription] = useState(initialData?.description || '');
+export function ProductForm({ onSubmit, initialData }: ProductFormProps) {
+  const [name, setName] = useState(initialData?.name || "");
+  const [description, setDescription] = useState(
+    initialData?.description || ""
+  );
+  const [price, setPrice] = useState(initialData?.price || 0);
+  const [stock, setStock] = useState(initialData?.stock || 0);
+  const [images, setImages] = useState<string[]>(initialData?.images || []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit({
-      name,
-      price: parseFloat(price) || 0,
-      description,
-    });
+    onSubmit({ name, description, price, stock, images });
+    // Reset form fields after submission
+    setName("");
+    setDescription("");
+    setPrice(0);
+    setStock(0);
+    setImages([]);
   };
 
+  async function handleGenerateDescription() {
+    try {
+      const input: GenerateProductDescriptionInput = {
+        attributes: "organic, non-gmo, sustainably-sourced",
+        keywords: "turmeric, spice, health, antioxidant",
+        style: "Informative and appealing",
+      };
+      const result = await generateProductDescription(input);
+      if (result.description) {
+        setDescription(result.description);
+      }
+    } catch (error) {
+      console.error("Failed to generate description:", error);
+    }
+  }
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div>
-        <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Product Name</label>
-        <Input id="name" placeholder="Enter product name" className="mt-1" value={name} onChange={e => setName(e.target.value)} required/>
-      </div>
-
-      <div>
-        <label htmlFor="price" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Price</label>
-        <Input id="price" type="number" placeholder="0.00" className="mt-1" value={price} onChange={e => setPrice(e.target.value)} required/>
-      </div>
-
-      <div>
-        <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Description</label>
-        <Textarea id="description" placeholder="Enter product description" className="mt-1" value={description} onChange={e => setDescription(e.target.value)} />
-      </div>
-
-      <div className="flex justify-end space-x-4 pt-4">
-        {onCancel && (
-            <Button variant="outline" onClick={onCancel} type="button">
-              Cancel
+    <form onSubmit={handleSubmit} className="grid gap-6">
+      <div className="grid gap-4 py-4">
+        <div className="space-y-2">
+          <label htmlFor="name">Name</label>
+          <Input
+            id="name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Product Name"
+          />
+        </div>
+        <div className="space-y-2">
+          <label htmlFor="images">Image URL</label>
+          <Input
+            id="images"
+            value={images[0] || ""}
+            onChange={(e) => setImages([e.target.value])}
+            placeholder="Image URL"
+          />
+        </div>
+        <div className="space-y-2">
+          <label htmlFor="description">Description</label>
+          <div className="relative">
+            <Textarea
+              id="description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Product Description"
+            />
+            <Button
+              type="button"
+              className="absolute bottom-2 right-2 h-7 w-7"
+              size="icon"
+              onClick={handleGenerateDescription}
+            >
+              <Bot className="h-4 w-4" />
+              <span className="sr-only">Generate with AI</span>
             </Button>
-        )}
-        <Button type="submit">
-          Save Product
-        </Button>
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <label htmlFor="price">Price</label>
+            <Input
+              id="price"
+              type="number"
+              value={price}
+              onChange={(e) => setPrice(parseFloat(e.target.value))}
+              placeholder="Price"
+            />
+          </div>
+          <div className="space-y-2">
+            <label htmlFor="stock">Stock</label>
+            <Input
+              id="stock"
+              type="number"
+              value={stock}
+              onChange={(e) => setStock(parseInt(e.target.value, 10))}
+              placeholder="Stock"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div className="flex justify-end">
+        <Button type="submit">Add Product</Button>
       </div>
     </form>
   );
