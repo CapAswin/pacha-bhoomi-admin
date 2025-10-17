@@ -14,7 +14,7 @@ async function getCategories() {
 
   const categories = JSON.parse(data.toString());
 
-  return z.array(categorySchema).parse(categories);
+  return z.array(categorySchema).parse(categories.categories);
 }
 
 export default async function CategoriesPage() {
