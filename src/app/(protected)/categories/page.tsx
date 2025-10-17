@@ -8,14 +8,8 @@ import { columns } from '@/components/admin/categories/category-table-columns';
 import { DataTable } from '@/components/admin/categories/category-table';
 import { categorySchema, Category } from '@/lib/types';
 import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
-import { CategoryForm } from '@/components/admin/categories/category-form';
+import { useModal } from '@/context/modal-context';
+import { CategoryModal } from '@/components/admin/categories/category-modal';
 
 async function getCategories(): Promise<Category[]> {
   const response = await fetch('/api/categories');
@@ -40,9 +34,32 @@ async function createCategory(category: Omit<Category, 'id'>): Promise<Category>
   return await response.json();
 }
 
+async function updateCategory(id: string, category: Omit<Category, 'id'>): Promise<Category> {
+    const response = await fetch(`/api/categories/${id}`, {
+        method: 'PUT',
+        headers: {
+        'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(category),
+    });
+    if (!response.ok) {
+        throw new Error('Failed to update category');
+    }
+    return await response.json();
+}
+
+async function deleteCategory(id: string): Promise<void> {
+    const response = await fetch(`/api/categories/${id}`, {
+        method: 'DELETE',
+    });
+    if (!response.ok) {
+        throw new Error('Failed to delete category');
+    }
+}
+
 export default function CategoriesPage() {
   const [categories, setCategories] = useState<Category[]>([]);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const { openModal } = useModal();
 
   useEffect(() => {
     getCategories().then(setCategories);
@@ -52,7 +69,24 @@ export default function CategoriesPage() {
     try {
       const newCategory = await createCategory(values);
       setCategories([...categories, newCategory]);
-      setIsDialogOpen(false);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleEdit = async (id: string, values: Omit<Category, 'id'>) => {
+    try {
+      const updatedCategory = await updateCategory(id, values);
+      setCategories(categories.map(c => c.id === id ? updatedCategory : c));
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    try {
+      await deleteCategory(id);
+      setCategories(categories.filter(c => c.id !== id));
     } catch (error) {
       console.error(error);
     }
@@ -60,6 +94,7 @@ export default function CategoriesPage() {
 
   return (
     <div className="hidden h-full flex-1 flex-col space-y-8 p-8 md:flex">
+        <CategoryModal onCreate={handleCreate} onEdit={handleEdit} />
       <div className="flex items-center justify-between space-y-2">
         <div>
           <h2 className="text-2xl font-bold tracking-tight">Categories</h2>
@@ -67,22 +102,9 @@ export default function CategoriesPage() {
             Here&apos;s a list of your product categories.
           </p>
         </div>
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogTrigger asChild>
-            <Button>Create Category</Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Create Category</DialogTitle>
-            </DialogHeader>
-            <CategoryForm
-              onSubmit={handleCreate}
-              onCancel={() => setIsDialogOpen(false)}
-            />
-          </DialogContent>
-        </Dialog>
+        <Button onClick={() => openModal('createCategory')}>Create Category</Button>
       </div>
-      <DataTable data={categories} columns={columns} />
+      <DataTable data={categories} columns={columns} meta={{ onDelete: handleDelete }} />
     </div>
   );
 }
