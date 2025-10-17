@@ -1,0 +1,20 @@
+
+{
+  "categories": [
+    {
+      "id": "cat-1",
+      "name": "Herbs",
+      "description": "Medicinal and aromatic herbs."
+    },
+    {
+      "id": "cat-2",
+      "name": "Spices",
+      "description": "Flavorful and aromatic spices."
+    },
+    {
+      "id": "cat-3",
+      "name": "Plants",
+      "description": "Live plants and seedlings."
+    }
+  ]
+}
