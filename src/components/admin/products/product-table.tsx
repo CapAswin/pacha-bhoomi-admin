@@ -29,31 +29,18 @@ interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   onDeleteProduct: (id: string) => void;
+  onAddProduct: (product: ProductFormValues) => void;
 }
 
 export function ProductTable<TData extends { id: string }, TValue>({
   columns,
-  data: initialData,
+  data,
   onDeleteProduct,
+  onAddProduct,
 }: DataTableProps<TData, TValue>) {
   const { openModal } = useModal();
-  const [products, setProducts] = React.useState<TData[]>(initialData ?? []);
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [rowSelection, setRowSelection] = React.useState({});
-
-  React.useEffect(() => {
-    if (initialData) {
-      setProducts(initialData);
-    }
-  }, [initialData]);
-
-  const addProduct = (product: ProductFormValues) => {
-    const newProduct = {
-      ...product,
-      id: `new-product-${Date.now()}`,
-    } as TData;
-    setProducts(prevProducts => [...prevProducts, newProduct]);
-  };
 
   const augmentedColumns = React.useMemo(() => {
     const filteredColumns = columns.filter(
@@ -75,7 +62,7 @@ export function ProductTable<TData extends { id: string }, TValue>({
   }, [columns, onDeleteProduct]);
 
   const table = useReactTable({
-    data: products,
+    data,
     columns: augmentedColumns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
@@ -147,7 +134,7 @@ export function ProductTable<TData extends { id: string }, TValue>({
         </div>
       </div>
       <DataTablePagination table={table} />
-      <CreateProductModal onSave={addProduct} />
+      <CreateProductModal onSave={onAddProduct} />
     </div>
   );
 }
