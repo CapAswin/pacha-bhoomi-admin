@@ -22,6 +22,8 @@ import {
 import { Button } from '@/components/ui/button';
 import { CreateProductModal } from './create-product-modal';
 import { ProductActions } from './product-actions';
+import { useModal } from '@/context/modal-context';
+import { ProductFormData } from './product-form';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -32,19 +34,26 @@ export function ProductTable<TData extends { id: string }, TValue>({
   columns,
   data: initialData,
 }: DataTableProps<TData, TValue>) {
-  const [isModalOpen, setIsModalOpen] = React.useState(false);
-  const [products, setProducts] = React.useState(initialData);
+  const { openModal } = useModal();
+  const [products, setProducts] = React.useState<TData[]>(initialData ?? []);
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [rowSelection, setRowSelection] = React.useState({});
 
+  React.useEffect(() => {
+    if (initialData) {
+      setProducts(initialData);
+    }
+  }, [initialData]);
+
   const addProduct = (product: { name: string; price: number; description: string }) => {
     const newProduct = {
-        ...product,
-        id: `product-${products.length + 1}`,
-        // You can add other default fields here
-    } as TData;
+      ...product,
+      id: `product-${products.length + 1}`,
+    } as unknown as TData;
+  
     setProducts(prevProducts => [...prevProducts, newProduct]);
   };
+  
 
   const augmentedColumns = React.useMemo(
     () => [
@@ -76,12 +85,13 @@ export function ProductTable<TData extends { id: string }, TValue>({
       sorting,
       rowSelection,
     },
+    getRowId: (row) => (row as TData).id,
   });
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-end">
-        <Button onClick={() => setIsModalOpen(true)}>Create Product</Button>
+        <Button onClick={() => openModal('createProduct')}>Create Product</Button>
       </div>
       <div className="border rounded-lg bg-card text-card-foreground shadow-sm glassmorphism mt-4">
         <div className="relative w-full overflow-auto max-h-[60vh]">
@@ -136,11 +146,7 @@ export function ProductTable<TData extends { id: string }, TValue>({
         </div>
       </div>
       <DataTablePagination table={table} />
-      <CreateProductModal 
-        isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)} 
-        onSave={addProduct}
-      />
+      <CreateProductModal onSave={addProduct} />
     </div>
   );
 }

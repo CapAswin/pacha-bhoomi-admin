@@ -1,36 +1,23 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
+import React from 'react';
+import { useModal } from '@/context/modal-context';
+import { ProductForm, ProductFormData } from './product-form';
 
 interface CreateProductModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onSave: (product: { name: string; price: number; description: string }) => void;
+  onSave: (data: ProductFormData) => void;
 }
 
-export function CreateProductModal({ isOpen, onClose, onSave }: CreateProductModalProps) {
-  const [name, setName] = useState('');
-  const [price, setPrice] = useState('');
-  const [description, setDescription] = useState('');
+export function CreateProductModal({ onSave }: CreateProductModalProps) {
+  const { modal, closeModal } = useModal();
 
-  if (!isOpen) {
+  if (modal !== 'createProduct') {
     return null;
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSave({
-      name,
-      price: parseFloat(price) || 0,
-      description,
-    });
-    setName('');
-    setPrice('');
-    setDescription('');
-    onClose();
+  const handleSave = (data: ProductFormData) => {
+    onSave(data);
+    closeModal();
   };
 
   return (
@@ -39,37 +26,13 @@ export function CreateProductModal({ isOpen, onClose, onSave }: CreateProductMod
         <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-gray-100">Create New Product</h2>
         
         <button 
-          onClick={onClose}
+          onClick={closeModal}
           className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200"
         >
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
         </button>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Product Name</label>
-            <Input id="name" placeholder="Enter product name" className="mt-1" value={name} onChange={e => setName(e.target.value)} />
-          </div>
-
-          <div>
-            <label htmlFor="price" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Price</label>
-            <Input id="price" type="number" placeholder="0.00" className="mt-1" value={price} onChange={e => setPrice(e.target.value)} />
-          </div>
-
-          <div>
-            <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Description</label>
-            <Textarea id="description" placeholder="Enter product description" className="mt-1" value={description} onChange={e => setDescription(e.target.value)} />
-          </div>
-
-          <div className="flex justify-end space-x-4 pt-4">
-            <Button variant="outline" onClick={onClose} type="button">
-              Cancel
-            </Button>
-            <Button type="submit">
-              Save Product
-            </Button>
-          </div>
-        </form>
+        <ProductForm onSubmit={handleSave} onCancel={closeModal} />
       </div>
     </div>
   );
