@@ -1,6 +1,7 @@
+import { ObjectId } from 'mongodb';
+
 export type Product = {
-  _id?: string; // MongoDB's default unique identifier
-  id?: string; // Keep for frontend compatibility, but it's optional
+  id: string; // Unique identifier, consistently used across the app
   name: string;
   price: number;
   stock: number;

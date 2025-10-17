@@ -1,0 +1,63 @@
+import { NextRequest, NextResponse } from 'next/server';
+import clientPromise from '@/lib/mongodb';
+import { ObjectId } from 'mongodb';
+
+async function getDb() {
+    const client = await clientPromise;
+    return client.db('authdb');
+}
+
+export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+    try {
+        const db = await getDb();
+        const product = await db.collection('products').findOne({ _id: new ObjectId(params.id) });
+        if (!product) {
+            return new NextResponse('Product not found', { status: 404 });
+        }
+        // Return a consistent product shape with a string id
+        const { _id, ...productData } = product;
+        return NextResponse.json({ id: _id.toHexString(), ...productData });
+    } catch (error) {
+        console.error('Failed to fetch product:', error);
+        return new NextResponse('Internal Server Error', { status: 500 });
+    }
+}
+
+export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+    try {
+        const db = await getDb();
+        const productData = await request.json();
+        const { name, description, price, stock } = productData;
+
+        const result = await db.collection('products').updateOne(
+            { _id: new ObjectId(params.id) },
+            { $set: { name, description, price, stock } }
+        );
+
+        if (result.matchedCount === 0) {
+            return new NextResponse('Product not found', { status: 404 });
+        }
+
+        return new NextResponse(null, { status: 204 });
+    } catch (error) {
+        console.error('Failed to update product:', error);
+        return new NextResponse('Internal Server Error', { status: 500 });
+    }
+}
+
+export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+    try {
+        const db = await getDb();
+        const result = await db.collection('products').deleteOne({ _id: new ObjectId(params.id) });
+
+        if (result.deletedCount === 0) {
+            // This is the source of the client-side error
+            return new NextResponse('Product not found', { status: 404 });
+        }
+
+        return new NextResponse(null, { status: 204 });
+    } catch (error) {
+        console.error('Failed to delete product:', error);
+        return new NextResponse('Internal Server Error', { status: 500 });
+    }
+}

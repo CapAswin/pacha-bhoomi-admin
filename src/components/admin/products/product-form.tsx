@@ -12,23 +12,30 @@ export type ProductFormValues = {
     description: string;
     price: number;
     stock: number;
+    images: string[];
 };
 
 interface ProductFormProps {
     onSubmit: (values: ProductFormValues) => void;
     initialData?: Product | null;
-    onClose: () => void;
 }
 
-export function ProductForm({ onSubmit, initialData, onClose }: ProductFormProps) {
+export function ProductForm({ onSubmit, initialData }: ProductFormProps) {
     const [name, setName] = useState(initialData?.name || '');
     const [description, setDescription] = useState(initialData?.description || '');
     const [price, setPrice] = useState(initialData?.price || 0);
     const [stock, setStock] = useState(initialData?.stock || 0);
+    const [images, setImages] = useState<string[]>(initialData?.images || []);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        onSubmit({ name, description, price, stock });
+        onSubmit({ name, description, price, stock, images });
+        // Reset form fields after submission
+        setName('');
+        setDescription('');
+        setPrice(0);
+        setStock(0);
+        setImages([]);
     };
 
     async function handleGenerateDescription() {
@@ -49,15 +56,14 @@ export function ProductForm({ onSubmit, initialData, onClose }: ProductFormProps
 
     return (
         <form onSubmit={handleSubmit} className="grid gap-6">
-            <div className="flex flex-col space-y-1.5">
-              <h2 className="text-lg font-semibold leading-none tracking-tight">{initialData ? 'Edit Product' : 'Add New Product'}</h2>
-              <p className="text-sm text-muted-foreground">Fill in the details for the product.</p>
-            </div>
-
-            <div className="grid gap-4 py-4 max-h-[70vh] overflow-y-auto">
+            <div className="grid gap-4 py-4">
                 <div className="space-y-2">
                     <label htmlFor="name">Name</label>
                     <Input id="name" value={name} onChange={e => setName(e.target.value)} placeholder="Product Name" />
+                </div>
+                <div className="space-y-2">
+                    <label htmlFor="images">Image URL</label>
+                    <Input id="images" value={images[0] || ''} onChange={e => setImages([e.target.value])} placeholder="Image URL" />
                 </div>
                 <div className="space-y-2">
                     <label htmlFor="description">Description</label>
@@ -81,9 +87,8 @@ export function ProductForm({ onSubmit, initialData, onClose }: ProductFormProps
                 </div>
             </div>
 
-            <div className="flex justify-end space-x-2">
-                <Button type="button" variant="outline" onClick={onClose}>Cancel</Button>
-                <Button type="submit">Save</Button>
+            <div className="flex justify-end">
+                <Button type="submit">Add Product</Button>
             </div>
         </form>
     );
