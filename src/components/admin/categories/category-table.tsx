@@ -20,9 +20,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Input } from "@/components/ui/input"
-import { Button } from '@/components/ui/button';
-import { CategoryForm, CategoryFormValues } from './category-form';
+import { Input } from "@/components/ui/input";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -35,7 +33,6 @@ export function DataTable<TData, TValue>({
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [rowSelection, setRowSelection] = React.useState({});
-  const [isModalOpen, setIsModalOpen] = React.useState(false);
   const [globalFilter, setGlobalFilter] = React.useState('');
 
   const table = useReactTable({
@@ -55,11 +52,6 @@ export function DataTable<TData, TValue>({
     },
   });
 
-  const handleAddCategory = (values: CategoryFormValues) => {
-    console.log('Adding category:', values);
-    setIsModalOpen(false);
-  };
-
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -71,7 +63,6 @@ export function DataTable<TData, TValue>({
           }
           className="max-w-sm"
         />
-        <Button onClick={() => setIsModalOpen(true)}>Add Category</Button>
       </div>
       <div className="rounded-md border">
         <Table>
@@ -124,18 +115,6 @@ export function DataTable<TData, TValue>({
         </Table>
       </div>
       <DataTablePagination table={table} />
-
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-8 rounded-lg shadow-lg dark:bg-gray-800">
-            <h3 className="text-lg font-semibold mb-4">Add New Category</h3>
-            <CategoryForm
-              onSubmit={handleAddCategory}
-              onCancel={() => setIsModalOpen(false)}
-            />
-          </div>
-        </div>
-      )}
     </div>
   );
 }
