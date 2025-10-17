@@ -1,12 +1,9 @@
 'use client';
 import type { ColumnDef } from '@tanstack/react-table';
-import { MoreHorizontal, ArrowUpDown } from 'lucide-react';
+import { ArrowUpDown } from 'lucide-react';
 import type { Product } from '@/lib/types';
 
-export const columns = (
-  handleDelete: (id: string) => void,
-  handleEdit: (product: Product) => void
-): ColumnDef<Product>[] => [
+export const columns: ColumnDef<Product>[] = [
   {
     accessorKey: 'images',
     header: 'Image',
@@ -48,21 +45,5 @@ export const columns = (
     accessorKey: 'stock',
     header: () => <div className="text-right">Stock</div>,
     cell: ({ row }) => <div className="text-right font-medium">{row.getValue('stock')}</div>,
-  },
-  {
-    id: 'actions',
-    cell: ({ row }) => {
-      const product = row.original;
-      return (
-        <div className="relative">
-          <button
-            onClick={() => handleDelete(product.id as string)}
-            className="text-destructive hover:text-destructive/80"
-          >
-            Delete
-          </button>
-        </div>
-      );
-    },
   },
 ];
