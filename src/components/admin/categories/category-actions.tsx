@@ -6,10 +6,9 @@ import { Category } from '@/lib/types';
 
 interface CategoryActionsProps {
   category: Category;
-  onDelete: (id: string) => void;
 }
 
-export function CategoryActions({ category, onDelete }: CategoryActionsProps) {
+export function CategoryActions({ category }: CategoryActionsProps) {
   const { openModal } = useModal();
 
   return (
@@ -17,7 +16,7 @@ export function CategoryActions({ category, onDelete }: CategoryActionsProps) {
       <Button variant="outline" size="sm" onClick={() => openModal('editCategory', { category })}>
         Edit
       </Button>
-      <Button variant="destructive" size="sm" onClick={() => onDelete(category.id)}>
+      <Button variant="destructive" size="sm" onClick={() => openModal('confirmDeleteCategory', { category })}>
         Delete
       </Button>
     </div>

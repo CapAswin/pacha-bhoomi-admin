@@ -9,6 +9,7 @@ interface ModalContextType {
   openModal: (modal: ModalType, data?: any) => void;
   closeModal: () => void;
   data?: any;
+  type?:any;
 }
 
 const ModalContext = createContext<ModalContextType | undefined>(undefined);

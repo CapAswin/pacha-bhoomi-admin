@@ -10,6 +10,7 @@ import { categorySchema, Category } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { useModal } from '@/context/modal-context';
 import { CategoryModal } from '@/components/admin/categories/category-modal';
+import { CategoryDeleteModal } from '@/components/admin/categories/category-delete-modal';
 
 async function getCategories(): Promise<Category[]> {
   const response = await fetch('/api/categories');
@@ -95,6 +96,7 @@ export default function CategoriesPage() {
   return (
     <div className="hidden h-full flex-1 flex-col space-y-8 p-8 md:flex">
         <CategoryModal onCreate={handleCreate} onEdit={handleEdit} />
+        <CategoryDeleteModal onDelete={handleDelete} />
       <div className="flex items-center justify-between space-y-2">
         <div>
           <h2 className="text-2xl font-bold tracking-tight">Categories</h2>
@@ -104,7 +106,7 @@ export default function CategoriesPage() {
         </div>
         <Button onClick={() => openModal('createCategory')}>Create Category</Button>
       </div>
-      <DataTable data={categories} columns={columns} meta={{ onDelete: handleDelete }} />
+      <DataTable data={categories} columns={columns} />
     </div>
   );
 }
