@@ -5,10 +5,21 @@ import { Product } from "@/lib/types";
 import { ProductTable } from "@/components/admin/products/product-table";
 import { columns } from "@/components/admin/products/product-table-columns";
 import { ProductTableSkeleton } from "@/components/admin/products/product-table-skeleton";
+import { ProductFormValues } from "@/components/admin/products/product-form";
 
 async function fetchProducts(): Promise<Product[]> {
   const response = await fetch("/api/products");
   if (!response.ok) throw new Error("Failed to fetch products");
+  return response.json();
+}
+
+async function addProduct(newProduct: ProductFormValues): Promise<Product> {
+  const response = await fetch("/api/products", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(newProduct),
+  });
+  if (!response.ok) throw new Error("Failed to add product");
   return response.json();
 }
 
@@ -28,10 +39,19 @@ export default function ProductsPage() {
     isError,
   } = useQuery<Product[]>({ queryKey: ["products"], queryFn: fetchProducts });
 
+  const addMutation = useMutation({
+    mutationFn: addProduct,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["products"] }),
+  });
+
   const deleteMutation = useMutation({
     mutationFn: deleteProduct,
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["products"] }),
   });
+
+  const handleAddProduct = async (productData: ProductFormValues) => {
+    await addMutation.mutateAsync(productData);
+  };
 
   const handleDeleteProduct = async (productId: string) => {
     if (window.confirm("Are you sure you want to delete this product?")) {
@@ -57,6 +77,7 @@ export default function ProductsPage() {
             <ProductTable
               columns={columns}
               data={productList}
+              onAddProduct={handleAddProduct}
               onDeleteProduct={handleDeleteProduct}
             />
           )}
