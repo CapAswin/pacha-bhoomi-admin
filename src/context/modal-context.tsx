@@ -1,15 +1,21 @@
 'use client';
 
+import { Category } from '@/lib/types';
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
-export type ModalType = 'createProduct' | 'editProduct' | 'createCategory' | 'editCategory' | null;
+export type ModalType =
+  | { type: 'createProduct'; data?: any }
+  | { type: 'editProduct'; data?: any }
+  | { type: 'createCategory'; data?: any }
+  | { type: 'editCategory'; data?: any }
+  | { type: 'confirmDeleteCategory'; data: { category: Category } }
+  | null;
 
 interface ModalContextType {
   modal: ModalType;
   openModal: (modal: ModalType, data?: any) => void;
   closeModal: () => void;
   data?: any;
-  type?:any;
 }
 
 const ModalContext = createContext<ModalContextType | undefined>(undefined);
