@@ -12,11 +12,8 @@ interface CategoryDeleteModalProps {
 export function CategoryDeleteModal({ onDelete }: CategoryDeleteModalProps) {
   const { modal, closeModal } = useModal();
 
-  if (modal?.type !== 'confirmDeleteCategory') {
-    return null;
-  }
-
-  const { category } = modal.data as { category: Category };
+  const isVisible = modal?.type === 'confirmDeleteCategory';
+  const category = (modal?.data as { category: Category })?.category;
 
   const handleConfirm = () => {
     if (category && onDelete) {
@@ -26,7 +23,7 @@ export function CategoryDeleteModal({ onDelete }: CategoryDeleteModalProps) {
   };
 
   return (
-    <Dialog open={modal.type === 'confirmDeleteCategory'} onOpenChange={closeModal}>
+    <Dialog open={isVisible} onOpenChange={closeModal}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Are you absolutely sure?</DialogTitle>
