@@ -11,7 +11,7 @@ interface CreateProductModalProps {
 export function CreateProductModal({ onSave }: CreateProductModalProps) {
   const { modal, closeModal } = useModal();
 
-  if (modal !== 'createProduct') {
+  if (modal?.type !== 'createProduct') {
     return null;
   }
 
