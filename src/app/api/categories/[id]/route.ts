@@ -53,6 +53,12 @@ export async function PUT(request: Request, { params }: { params: { id: string }
 export async function DELETE(request: Request, { params }: { params: { id: string } }) {
     try {
         const db = await getDb();
+        const productCount = await db.collection('products').countDocuments({ categoryId: new ObjectId(params.id) });
+
+        if (productCount > 0) {
+            return NextResponse.json({ message: 'Category has associated products and cannot be deleted.' }, { status: 400 });
+        }
+
         const result = await db.collection('categories').deleteOne({ _id: new ObjectId(params.id) });
         if (result.deletedCount === 0) {
             return NextResponse.json({ message: 'Category not found' }, { status: 404 });
