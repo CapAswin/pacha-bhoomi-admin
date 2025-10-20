@@ -2,10 +2,13 @@
 'use client';
 
 import type { PropsWithChildren } from 'react';
+import dynamic from 'next/dynamic';
 import { SidebarNav } from '@/components/admin/sidebar-nav';
 import { Header } from '@/components/admin/header';
 import { Providers } from '@/components/providers';
-import LoadingOverlay from '@/components/loading-overlay';
+
+// Dynamically import LoadingOverlay with SSR disabled
+const LoadingOverlay = dynamic(() => import('@/components/loading-overlay'), { ssr: false });
 
 export default function DashboardLayout({ children }: PropsWithChildren) {
   return (
