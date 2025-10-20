@@ -5,8 +5,11 @@ import type { PropsWithChildren } from 'react';
 import { SidebarNav } from '@/components/admin/sidebar-nav';
 import { Header } from '@/components/admin/header';
 import { Providers } from '@/components/providers';
+import LoadingOverlay from '@/components/loading-overlay';
+import { useLoading } from '@/context/loading-context';
 
 export default function DashboardLayout({ children }: PropsWithChildren) {
+  const { loadingMessage } = useLoading();
   return (
     <Providers>
       <div className="flex min-h-screen w-full">
@@ -18,6 +21,7 @@ export default function DashboardLayout({ children }: PropsWithChildren) {
           </main>
         </div>
       </div>
+      <LoadingOverlay message={loadingMessage} />
     </Providers>
   );
 }
