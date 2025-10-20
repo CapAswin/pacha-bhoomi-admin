@@ -3,12 +3,8 @@
 import React from 'react';
 import { useLoading } from '@/context/loading-context';
 
-export default function LoadingOverlay({
-  message = 'Loading...',
-}: {
-  message?: string;
-}) {
-  const { isLoading } = useLoading();
+export default function LoadingOverlay() {
+  const { isLoading, loadingMessage } = useLoading();
 
   if (!isLoading) {
     return null;
@@ -31,7 +27,7 @@ export default function LoadingOverlay({
             style={{ animationDelay: '0.24s' }}
           />
         </div>
-        <span className="text-sm text-white/90">{message}</span>
+        <span className="text-sm text-white/90">{loadingMessage}</span>
       </div>
 
       <style jsx global>{`
