@@ -2,7 +2,6 @@
 import { NextResponse } from 'next/server';
 import clientPromise from '@/lib/mongodb';
 import { ObjectId } from 'mongodb';
-import type { Category } from '@/lib/types';
 
 async function getDb() {
     const client = await clientPromise;
@@ -26,16 +25,25 @@ export async function GET(request: Request, { params }: { params: { id: string }
 
 export async function PUT(request: Request, { params }: { params: { id: string } }) {
     try {
-        const db = await getDb();
+        const { id } = params;
         const categoryData = await request.json();
+        
+        delete categoryData.id;
+        delete categoryData._id;
+
+        const db = await getDb();
         const result = await db.collection('categories').updateOne(
-            { _id: new ObjectId(params.id) },
+            { _id: new ObjectId(id) },
             { $set: categoryData }
         );
+
         if (result.matchedCount === 0) {
             return NextResponse.json({ message: 'Category not found' }, { status: 404 });
         }
-        return NextResponse.json({ message: 'Category updated' });
+
+        const updatedCategory = await db.collection('categories').findOne({ _id: new ObjectId(id) });
+
+        return NextResponse.json(updatedCategory);
     } catch (error) {
         console.error('Error updating category:', error);
         return NextResponse.json({ message: 'Error updating category' }, { status: 500 });
@@ -49,7 +57,7 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
         if (result.deletedCount === 0) {
             return NextResponse.json({ message: 'Category not found' }, { status: 404 });
         }
-        return NextResponse.json({ message: 'Category deleted' }, { status: 200 });
+        return new Response(null, { status: 204 });
     } catch (error) {
         console.error('Error deleting category:', error);
         return NextResponse.json({ message: 'Error deleting category' }, { status: 500 });
