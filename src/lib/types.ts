@@ -20,7 +20,7 @@ export const productSchema = z.object({
   description: z.string(),
   images: z.array(z.string()),
   createdAt: z.string(),
-  categoryId: z.union([z.string(), z.instanceof(ObjectId)]),
+  categoryId: z.union([z.string(), z.instanceof(ObjectId)]).nullable(),
 });
 
 export type Product = z.infer<typeof productSchema>;

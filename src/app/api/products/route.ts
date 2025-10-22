@@ -88,7 +88,7 @@ export async function POST(request: Request) {
           description: productData.description,
           images: productData.images && productData.images.length > 0 ? productData.images : ['/placeholder.svg'],
           createdAt: new Date().toISOString(),
-          categoryId: new ObjectId(productData.categoryId),
+          categoryId: productData.categoryId ? new ObjectId(productData.categoryId) : null,
         };
         
         const result = await db.collection('products').insertOne(newProduct as any);

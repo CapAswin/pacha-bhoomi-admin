@@ -15,7 +15,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 
         const result = await db.collection('products').updateOne(
             { _id: new ObjectId(params.id) },
-            { $set: { name, description, price, stock, images, categoryId: new ObjectId(categoryId) } }
+            { $set: { name, description, price, stock, images, categoryId: categoryId ? new ObjectId(categoryId) : null } }
         );
 
         if (result.matchedCount === 0) {
