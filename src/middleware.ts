@@ -5,6 +5,12 @@ export async function middleware(req: NextRequest) {
   const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
   const { pathname } = req.nextUrl;
 
+  if (!process.env.NEXTAUTH_URL) {
+    console.error(
+      "NEXTAUTH_URL environment variable is not set. Defaulting to http://localhost:3000"
+    );
+  }
+
   // Public pages (no login required)
   const publicPaths = ["/login", "/register"];
 
@@ -28,7 +34,6 @@ export async function middleware(req: NextRequest) {
   if (!token && !isPublicPath) {
     return NextResponse.redirect(new URL("/login", req.url));
   }
-
   return NextResponse.next();
 }
 
