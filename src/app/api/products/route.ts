@@ -81,6 +81,7 @@ export async function GET(request: Request) {
             },
           },
         },
+        { $sort: { createdAt: -1 } },
       ])
       .toArray();
 

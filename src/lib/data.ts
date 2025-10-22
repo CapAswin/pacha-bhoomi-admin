@@ -97,13 +97,13 @@ export const products: Product[] = [
   },
 ];
 
-export const orders: Order[] = [
+const unsortedOrders = [
   {
     id: "ORD-001",
     customer: { name: "Alice Johnson", email: "alice@example.com" },
     date: "2023-10-26",
     createdAt: "2023-10-26T10:00:00.000Z",
-    status: "Delivered",
+    status: "Delivered" as const,
     total: 49.98,
   },
   {
@@ -111,7 +111,7 @@ export const orders: Order[] = [
     customer: { name: "Bob Smith", email: "bob@example.com" },
     date: "2023-10-25",
     createdAt: "2023-10-25T14:30:00.000Z",
-    status: "Shipped",
+    status: "Shipped" as const,
     total: 19.99,
   },
   {
@@ -119,7 +119,7 @@ export const orders: Order[] = [
     customer: { name: "Charlie Brown", email: "charlie@example.com" },
     date: "2023-10-25",
     createdAt: "2023-10-25T09:15:00.000Z",
-    status: "Processing",
+    status: "Processing" as const,
     total: 15.5,
   },
   {
@@ -127,7 +127,7 @@ export const orders: Order[] = [
     customer: { name: "Diana Prince", email: "diana@example.com" },
     date: "2023-10-24",
     createdAt: "2023-10-24T16:45:00.000Z",
-    status: "Delivered",
+    status: "Delivered" as const,
     total: 105.0,
   },
   {
@@ -135,12 +135,16 @@ export const orders: Order[] = [
     customer: { name: "Ethan Hunt", email: "ethan@example.com" },
     date: "2023-10-23",
     createdAt: "2023-10-23T11:20:00.000Z",
-    status: "Cancelled",
+    status: "Cancelled" as const,
     total: 25.0,
   },
 ];
 
-export const customers: Customer[] = [
+export const orders: Order[] = unsortedOrders.sort(
+  (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+);
+
+const unsortedCustomers = [
   {
     id: "CUST-001",
     name: "Alice Johnson",
@@ -182,6 +186,10 @@ export const customers: Customer[] = [
     createdAt: "2023-10-16T14:20:00.000Z",
   },
 ];
+
+export const customers: Customer[] = unsortedCustomers.sort(
+  (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+);
 
 export const promotions: Promotion[] = [
   {
