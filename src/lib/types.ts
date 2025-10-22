@@ -1,13 +1,13 @@
-import { z } from 'zod';
+import { z } from "zod";
 
 export const categorySchema = z.object({
   id: z.string(),
   name: z.string(),
   description: z.string().optional(),
+  createdAt: z.string(),
 });
 
 export type Category = z.infer<typeof categorySchema>;
-
 
 export const productSchema = z.object({
   id: z.string(),
@@ -21,9 +21,7 @@ export const productSchema = z.object({
   categoryId: z.string().nullable(),
 });
 
-
 export type Product = z.infer<typeof productSchema>;
-
 
 export type Order = {
   id: string;
@@ -32,7 +30,8 @@ export type Order = {
     email: string;
   };
   date: string;
-  status: 'Processing' | 'Shipped' | 'Delivered' | 'Cancelled';
+  createdAt: string;
+  status: "Processing" | "Shipped" | "Delivered" | "Cancelled";
   total: number;
 };
 
@@ -42,14 +41,15 @@ export type Customer = {
   email: string;
   totalSpent: number;
   orders: number;
+  createdAt: string;
 };
 
 export type Promotion = {
   id: string;
   code: string;
-  type: 'Percentage' | 'Fixed Amount' | 'Free Shipping';
+  type: "Percentage" | "Fixed Amount" | "Free Shipping";
   value: string;
-  status: 'Active' | 'Expired' | 'Scheduled';
+  status: "Active" | "Expired" | "Scheduled";
   startDate: string;
   endDate: string;
 };

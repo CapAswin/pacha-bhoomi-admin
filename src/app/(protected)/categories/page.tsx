@@ -67,13 +67,25 @@ export default function CategoriesPage() {
   const { openModal } = useModal();
 
   useEffect(() => {
-    getCategories().then(setCategories);
+    getCategories().then((data) => {
+      const sortedData = [...data].sort((a, b) => {
+        const dateA = a?.createdAt ? new Date(a.createdAt).getTime() : 0;
+        const dateB = b?.createdAt ? new Date(b.createdAt).getTime() : 0;
+        return dateB - dateA;
+      });
+      setCategories(sortedData);
+    });
   }, []);
 
   const handleCreate = async (values: Omit<Category, "id">) => {
     try {
       const newCategory = await createCategory(values);
-      setCategories([...categories, newCategory]);
+      const updatedCategories = [...categories, newCategory].sort((a, b) => {
+        const dateA = a?.createdAt ? new Date(a.createdAt).getTime() : 0;
+        const dateB = b?.createdAt ? new Date(b.createdAt).getTime() : 0;
+        return dateB - dateA;
+      });
+      setCategories(updatedCategories);
     } catch (error) {
       console.error(error);
     }

@@ -1,16 +1,16 @@
-'use client';
-import type { ColumnDef } from '@tanstack/react-table';
-import { ArrowUpDown } from 'lucide-react';
-import type { Category } from '@/lib/types';
-import { CategoryActions } from '@/components/admin/categories/category-actions';
+"use client";
+import type { ColumnDef } from "@tanstack/react-table";
+import { ArrowUpDown } from "lucide-react";
+import type { Category } from "@/lib/types";
+import { CategoryActions } from "@/components/admin/categories/category-actions";
 
 export const columns: ColumnDef<Category>[] = [
   {
-    accessorKey: 'name',
+    accessorKey: "name",
     header: ({ column }) => (
       <button
         className="flex items-center gap-2"
-        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
       >
         Name
         <ArrowUpDown className="ml-2 h-4 w-4" />
@@ -18,11 +18,35 @@ export const columns: ColumnDef<Category>[] = [
     ),
   },
   {
-    accessorKey: 'description',
-    header: 'Description',
+    accessorKey: "description",
+    header: "Description",
   },
   {
-    id: 'actions',
+    accessorKey: "createdAt",
+    header: ({ column }) => (
+      <button
+        className="flex items-center gap-2"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+      >
+        Date
+        <ArrowUpDown className="ml-2 h-4 w-4" />
+      </button>
+    ),
+    cell: ({ row }) => {
+      const createdAt = row.getValue("createdAt");
+      if (!createdAt) {
+        return <div>-</div>;
+      }
+      const date = new Date(createdAt as string);
+      if (isNaN(date.getTime())) {
+        return <div>-</div>;
+      }
+      const formattedDate = new Intl.DateTimeFormat("en-US").format(date);
+      return <div>{formattedDate}</div>;
+    },
+  },
+  {
+    id: "actions",
     cell: ({ row }) => <CategoryActions category={row.original} />,
   },
 ];

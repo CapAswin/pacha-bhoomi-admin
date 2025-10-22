@@ -84,12 +84,20 @@ export async function GET(request: Request) {
       ])
       .toArray();
 
-    const formattedProducts = products.map((p) => ({
-      ...p,
-      id: p._id.toString(),
-      categoryId: p.categoryId ? p.categoryId.toString() : null,
-      _id: undefined,
-    }));
+    const formattedProducts = products.map((p) => {
+      const formatted = {
+        ...p,
+        id: p._id.toString(),
+        categoryId: p.categoryId ? p.categoryId.toString() : null,
+        _id: undefined,
+      };
+      console.log("Formatted product:", {
+        id: formatted.id,
+        createdAt: p.createdAt,
+        category: p.category,
+      });
+      return formatted;
+    });
     return NextResponse.json(formattedProducts);
   } catch (error) {
     console.error("Error fetching products:", error);

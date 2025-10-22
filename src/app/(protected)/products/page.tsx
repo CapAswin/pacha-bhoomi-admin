@@ -81,6 +81,8 @@ export default function ProductsPage() {
 
   const sortedProducts = React.useMemo(() => {
     if (!Array.isArray(productList)) return [];
+    console.log("Products data:", productList);
+    console.log("First product createdAt:", productList[0]?.createdAt);
     return [...productList].sort((a, b) => {
       const dateA = a?.createdAt ? new Date(a.createdAt).getTime() : 0;
       const dateB = b?.createdAt ? new Date(b.createdAt).getTime() : 0;

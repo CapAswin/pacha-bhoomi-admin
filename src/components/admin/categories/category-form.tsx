@@ -24,7 +24,7 @@ export function CategoryForm({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit({ name, description });
+    onSubmit({ name, description, createdAt: new Date().toISOString() });
   };
 
   return (
