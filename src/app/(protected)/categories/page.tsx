@@ -104,7 +104,7 @@ export default function CategoriesPage() {
           Categories
         </h1>
       </div>
-      <div className="hidden h-full flex-1 flex-col space-y-8 p-8 md:flex">
+      <div className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6 bg-background overflow-auto">
         <CategoryModal onCreate={handleCreate} onEdit={handleEdit} />
         <CategoryDeleteModal onDelete={handleDelete} />
         <div className="flex items-center justify-between space-y-2">
