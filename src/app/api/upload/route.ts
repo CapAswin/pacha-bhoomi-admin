@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { writeFile } from "fs/promises";
+import { writeFile, readdir } from "fs/promises";
 import path from "path";
 import { mkdir } from "fs/promises";
 
@@ -37,6 +37,22 @@ export async function POST(request: NextRequest) {
     );
     await mkdir(productDir, { recursive: true });
 
+    // Check image count limit (6 images max)
+    try {
+      const files = await readdir(productDir);
+      const imageFiles = files.filter((file: string) =>
+        /\.(jpg|jpeg|png|gif|webp)$/i.test(file)
+      );
+      if (imageFiles.length >= 6) {
+        return NextResponse.json(
+          { success: false, message: "Maximum 6 images allowed per product." },
+          { status: 400 }
+        );
+      }
+    } catch (error) {
+      // Directory might not exist yet, which is fine for new products
+    }
+
     // Generate unique filename
     const timestamp = Date.now();
     const filename = `${timestamp}_${file.name}`;
@@ -50,6 +66,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       imageUrl,
+      tempProductId: productId,
       message: "File uploaded successfully.",
     });
   } catch (error) {

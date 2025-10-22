@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import clientPromise from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
+import { rename } from "fs/promises";
+import path from "path";
 import type { Product } from "@/lib/types";
 
 // Adjusted to use null for consistency, matching the Product type.
@@ -114,6 +116,22 @@ export async function POST(request: Request) {
     const db = await getDb();
     const productData = await request.json();
 
+    // If there are uploaded images with temporary product ID, move them to the real product directory
+    const images = productData.images || [];
+    let finalImages = images;
+
+    if (images.length > 0) {
+      const tempProductId = images
+        .find((img: string) => img.includes("/uploads/products/"))
+        ?.split("/")[3];
+      if (tempProductId && !tempProductId.match(/^[0-9a-fA-F]{24}$/)) {
+        // Check if it's a temporary ID (not a MongoDB ObjectId)
+        // This is a new product with uploaded images using temp ID
+        // Images will be moved after product creation
+        finalImages = [];
+      }
+    }
+
     const productForDb = {
       name: productData.name,
       price: productData.price,
@@ -125,7 +143,7 @@ export async function POST(request: Request) {
             : "in stock"
           : "out of stock",
       description: productData.description,
-      images: productData.images || [],
+      images: finalImages,
       createdAt: new Date().toISOString(),
       categoryId: productData.categoryId
         ? new ObjectId(productData.categoryId)
@@ -136,9 +154,79 @@ export async function POST(request: Request) {
       .collection("products")
       .insertOne(productForDb as any);
 
+    const realProductId = result.insertedId.toString();
+
+    // Move uploaded images from temp directory to real product directory
+    if (images.length > 0) {
+      const updatedImages = [];
+      for (const imageUrl of images) {
+        if (imageUrl.startsWith("/uploads/products/")) {
+          const parts = imageUrl.split("/");
+          const tempProductId = parts[3];
+          const filename = parts[4];
+
+          if (tempProductId && !tempProductId.match(/^[0-9a-fA-F]{24}$/)) {
+            // Move file from temp directory to real directory
+            const tempDir = path.join(
+              process.cwd(),
+              "public",
+              "uploads",
+              "products",
+              tempProductId
+            );
+            const realDir = path.join(
+              process.cwd(),
+              "public",
+              "uploads",
+              "products",
+              realProductId
+            );
+
+            try {
+              // Create real directory
+              await import("fs/promises").then(({ mkdir }) =>
+                mkdir(realDir, { recursive: true })
+              );
+
+              // Move file
+              const oldPath = path.join(tempDir, filename);
+              const newPath = path.join(realDir, filename);
+              await rename(oldPath, newPath);
+
+              // Add updated URL to images array
+              updatedImages.push(
+                `/uploads/products/${realProductId}/${filename}`
+              );
+            } catch (error) {
+              console.error("Error moving image file:", error);
+              // If move fails, keep original URL (though this shouldn't happen in production)
+              updatedImages.push(imageUrl);
+            }
+          } else {
+            // Already has real product ID
+            updatedImages.push(imageUrl);
+          }
+        } else {
+          // External URL
+          updatedImages.push(imageUrl);
+        }
+      }
+
+      // Update product with correct image URLs
+      if (updatedImages.length > 0) {
+        await db
+          .collection("products")
+          .updateOne(
+            { _id: result.insertedId },
+            { $set: { images: updatedImages } }
+          );
+      }
+    }
+
     const insertedProduct: Product = {
       ...productData,
-      id: result.insertedId.toString(),
+      id: realProductId,
+      images: finalImages.length > 0 ? finalImages : images,
       categoryId: productData.categoryId || null,
     };
 

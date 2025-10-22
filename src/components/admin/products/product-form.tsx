@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { Product, Category } from "@/lib/types";
 import { Textarea } from "@/components/ui/textarea";
-import { X, Upload } from "lucide-react";
+import { X, Upload, GripVertical } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { SelectField } from "@/components/ui/select-field";
@@ -41,6 +41,7 @@ export function ProductForm({
   const [categories, setCategories] = useState<Category[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [tempProductId, setTempProductId] = useState<string>("");
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
 
   useEffect(() => {
     async function fetchCategories() {
@@ -77,7 +78,9 @@ export function ProductForm({
   };
 
   const addImageInput = () => {
-    setImages([...images, ""]);
+    if (images.length < 6) {
+      setImages([...images, ""]);
+    }
   };
 
   const removeImageInput = (index: number) => {
@@ -85,11 +88,42 @@ export function ProductForm({
     setImages(newImages);
   };
 
+  const handleDragStart = (index: number) => {
+    setDraggedIndex(index);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+  };
+
+  const handleDrop = (e: React.DragEvent, dropIndex: number) => {
+    e.preventDefault();
+    if (draggedIndex === null || draggedIndex === dropIndex) return;
+
+    const newImages = [...images];
+    const draggedImage = newImages[draggedIndex];
+    newImages.splice(draggedIndex, 1);
+    newImages.splice(dropIndex, 0, draggedImage);
+
+    setImages(newImages);
+    setDraggedIndex(null);
+  };
+
+  const handleDragEnd = () => {
+    setDraggedIndex(null);
+  };
+
   const handleFileUpload = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     const file = event.target.files?.[0];
     if (!file) return;
+
+    // Prevent upload if already at limit
+    if (images.length >= 6) {
+      console.error("Maximum 6 images allowed per product.");
+      return;
+    }
 
     setIsUploading(true);
 
@@ -119,6 +153,14 @@ export function ProductForm({
 
       if (result.success) {
         setImages([...images, result.imageUrl]);
+        // Update tempProductId if this was for a new product and we got a new ID back
+        if (
+          !initialData?.id &&
+          result.tempProductId &&
+          result.tempProductId !== tempProductId
+        ) {
+          setTempProductId(result.tempProductId);
+        }
       } else {
         console.error("Upload failed:", result.message);
       }
@@ -154,46 +196,66 @@ export function ProductForm({
         </div>
         <div className="space-y-2">
           <label>Product Images</label>
-          {images.map((image, index) => (
-            <div key={index} className="flex items-center gap-2">
-              {image.startsWith("/uploads/") ? (
-                <div className="flex items-center gap-2 flex-1">
-                  <img
-                    src={image}
-                    alt={`Product image ${index + 1}`}
-                    className="h-10 w-10 object-cover rounded"
-                  />
-                  <span
-                    className="text-sm text-gray-600 flex-1 truncate"
-                    title={image.split("/").pop()}
-                  >
-                    {image.split("/").pop()?.substring(0, 20)}...
-                  </span>
-                </div>
-              ) : (
-                <Input
-                  value={image}
-                  onChange={(e) => handleImageChange(index, e.target.value)}
-                  placeholder="Image URL"
-                  className="flex-1"
-                />
-              )}
-              <Button
-                type="button"
-                variant="outline"
-                size="icon"
-                onClick={() => removeImageInput(index)}
+          <div className="max-h-48 overflow-y-auto border rounded-md p-2">
+            {images.map((image, index) => (
+              <div
+                key={index}
+                className={`flex items-center gap-2 p-2 rounded ${
+                  draggedIndex === index
+                    ? "bg-blue-50 border-blue-200"
+                    : "hover:bg-gray-50"
+                }`}
+                draggable
+                onDragStart={() => handleDragStart(index)}
+                onDragOver={handleDragOver}
+                onDrop={(e) => handleDrop(e, index)}
+                onDragEnd={handleDragEnd}
               >
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
-          ))}
+                <GripVertical className="h-4 w-4 text-gray-400 cursor-move" />
+                {image.startsWith("/uploads/") ? (
+                  <div className="flex items-center gap-2 flex-1">
+                    <img
+                      src={image}
+                      alt={`Product image ${index + 1}`}
+                      className="h-10 w-10 object-cover rounded"
+                    />
+                    <span
+                      className="text-sm text-gray-600 flex-1 truncate"
+                      title={image.split("/").pop()}
+                    >
+                      {index === 0 && (
+                        <span className="text-green-600 font-medium mr-1">
+                          (Primary)
+                        </span>
+                      )}
+                      {image.split("/").pop()?.substring(0, 20)}...
+                    </span>
+                  </div>
+                ) : (
+                  <Input
+                    value={image}
+                    onChange={(e) => handleImageChange(index, e.target.value)}
+                    placeholder="Image URL"
+                    className="flex-1"
+                  />
+                )}
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={() => removeImageInput(index)}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            ))}
+          </div>
           <div className="flex gap-2">
             <Button
               type="button"
               variant="outline"
               onClick={addImageInput}
-              disabled={isUploading}
+              disabled={isUploading || images.length >= 6}
             >
               Add Image URL
             </Button>
@@ -203,9 +265,13 @@ export function ProductForm({
                 accept="image/*"
                 onChange={handleFileUpload}
                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                disabled={isUploading}
+                disabled={isUploading || images.length >= 6}
               />
-              <Button type="button" variant="outline" disabled={isUploading}>
+              <Button
+                type="button"
+                variant="outline"
+                disabled={isUploading || images.length >= 6}
+              >
                 <Upload className="h-4 w-4 mr-2" />
                 {isUploading ? "Uploading..." : "Upload Image"}
               </Button>

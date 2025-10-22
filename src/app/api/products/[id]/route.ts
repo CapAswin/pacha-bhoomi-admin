@@ -11,15 +11,16 @@ async function getDb() {
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const resolvedParams = await params;
     const db = await getDb();
     const productData = await request.json();
     const { name, description, price, stock, images, categoryId } = productData;
 
     const result = await db.collection("products").updateOne(
-      { _id: new ObjectId(params.id) },
+      { _id: new ObjectId(resolvedParams.id) },
       {
         $set: {
           name,
@@ -36,22 +37,26 @@ export async function PUT(
       return new NextResponse("Product not found", { status: 404 });
     }
 
-    return new NextResponse(null, { status: 204 });
+    return NextResponse.json({ success: true }, { status: 200 });
   } catch (error) {
     console.error("Failed to update product:", error);
-    return new NextResponse("Internal Server Error", { status: 500 });
+    return NextResponse.json(
+      { success: false, message: "Failed to update product" },
+      { status: 500 }
+    );
   }
 }
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const resolvedParams = await params;
     const db = await getDb();
     const productsCollection = db.collection("products");
 
-    const productId = params.id;
+    const productId = resolvedParams.id;
 
     // Get the product to check for images
     const product = await productsCollection.findOne({
@@ -98,7 +103,9 @@ export async function DELETE(
     }
 
     // Delete the product
-    await productsCollection.deleteOne({ _id: new ObjectId(params.id) });
+    await productsCollection.deleteOne({
+      _id: new ObjectId(resolvedParams.id),
+    });
 
     return new NextResponse(null, { status: 204 });
   } catch (error) {
