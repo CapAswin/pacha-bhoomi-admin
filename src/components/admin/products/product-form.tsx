@@ -10,7 +10,7 @@ import {
 } from "@/ai/ai-product-description";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { SelectField } from "@/components/ui/select-field";
 
 export type ProductFormValues = {
   name: string;
@@ -104,18 +104,12 @@ export function ProductForm({ onSubmit, initialData, onCancel }: ProductFormProp
         </div>
         <div className="space-y-2">
           <label htmlFor="category">Category</label>
-          <Select onValueChange={setCategoryId} defaultValue={categoryId}>
-            <SelectTrigger>
-              <SelectValue placeholder="Select a category" />
-            </SelectTrigger>
-            <SelectContent>
-              {categories.map((category) => (
-                <SelectItem key={category.id} value={category.id}>
-                  {category.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <SelectField
+            value={categoryId}
+            options={categories}
+            onChange={setCategoryId}
+            placeholder="Select a category"
+          />
         </div>
         <div className="space-y-2">
           <label>Image URLs</label>
