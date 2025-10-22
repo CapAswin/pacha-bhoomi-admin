@@ -125,10 +125,7 @@ export async function POST(request: Request) {
             : "in stock"
           : "out of stock",
       description: productData.description,
-      images:
-        productData.images && productData.images.length > 0
-          ? productData.images
-          : ["/placeholder.svg"],
+      images: productData.images || [],
       createdAt: new Date().toISOString(),
       categoryId: productData.categoryId
         ? new ObjectId(productData.categoryId)

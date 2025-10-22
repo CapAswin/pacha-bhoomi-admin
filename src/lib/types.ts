@@ -17,7 +17,7 @@ export const productSchema = z.object({
   stock: z.number(),
   status: z.enum(["in stock", "low stock", "out of stock"]),
   description: z.string().optional(),
-  images: z.array(z.string()).default(["/placeholder.svg"]),
+  images: z.array(z.string()).default([]),
   createdAt: z.string(),
   categoryId: z.string().nullable(),
 });
