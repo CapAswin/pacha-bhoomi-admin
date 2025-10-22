@@ -2,6 +2,7 @@
 import type { ColumnDef } from '@tanstack/react-table';
 import { ArrowUpDown } from 'lucide-react';
 import type { Product } from '@/lib/types';
+import { ProductActions } from './product-actions';
 
 export const columns: ColumnDef<Product>[] = [
   {
@@ -68,6 +69,13 @@ export const columns: ColumnDef<Product>[] = [
       }
       const formattedDate = new Intl.DateTimeFormat('en-US').format(date);
       return <div>{formattedDate}</div>;
+    },
+  },
+  {
+    id: 'actions',
+    cell: ({ row }) => {
+      const product = row.original;
+      return <ProductActions product={product} />;
     },
   },
 ];

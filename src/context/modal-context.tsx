@@ -7,6 +7,7 @@ import { Category, Product } from '@/lib/types';
 export type ModalType =
   | { type: 'createProduct'; data?: Product }
   | { type: 'editProduct'; data: { product: Product } }
+  | { type: 'confirmDeleteProduct'; data: { product: Product } }
   | { type: 'createCategory'; data?: Category }
   | { type: 'editCategory'; data: { category: Category } }
   | { type: 'confirmDeleteCategory'; data: { category: Category } }

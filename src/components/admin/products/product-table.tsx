@@ -20,50 +20,24 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { CreateProductModal } from './create-product-modal';
-import { ProductActions } from './product-actions';
 import { useModal } from '@/context/modal-context';
-import { ProductFormValues } from './product-form';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
-  onDeleteProduct: (id: string) => void;
-  onAddProduct: (product: ProductFormValues) => void;
 }
 
 export function ProductTable<TData extends { id: string }, TValue>({
   columns,
   data,
-  onDeleteProduct,
-  onAddProduct,
 }: DataTableProps<TData, TValue>) {
   const { openModal } = useModal();
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [rowSelection, setRowSelection] = React.useState({});
 
-  const augmentedColumns = React.useMemo(() => {
-    const filteredColumns = columns.filter(
-      (column) => (column as any).id !== 'actions' && (column as any).accessorKey !== 'actions'
-    );
-
-    return [
-      ...filteredColumns,
-      {
-        id: 'actions',
-        cell: ({ row }) => (
-          <ProductActions 
-            onEdit={() => console.log('Edit', row.original)} 
-            onDelete={() => onDeleteProduct((row.original as TData).id)}
-          />
-        ),
-      },
-    ];
-  }, [columns, onDeleteProduct]);
-
   const table = useReactTable({
     data,
-    columns: augmentedColumns,
+    columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     onSortingChange: setSorting,
@@ -122,7 +96,7 @@ export function ProductTable<TData extends { id: string }, TValue>({
               ) : (
                 <TableRow>
                   <TableCell
-                    colSpan={augmentedColumns.length}
+                    colSpan={columns.length}
                     className="h-24 text-center"
                   >
                     No results.
@@ -134,7 +108,6 @@ export function ProductTable<TData extends { id: string }, TValue>({
         </div>
       </div>
       <DataTablePagination table={table} />
-      <CreateProductModal onSave={onAddProduct} />
     </div>
   );
 }
