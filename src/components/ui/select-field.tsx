@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 
 interface SelectFieldProps {
-  value: string;
+  value: string | null | undefined;
   options: { id: string; name: string }[];
   onChange: (value: string) => void;
   placeholder?: string;

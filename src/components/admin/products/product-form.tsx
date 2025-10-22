@@ -3,11 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { Product, Category } from "@/lib/types";
 import { Textarea } from "@/components/ui/textarea";
-import { Bot, X } from "lucide-react";
-import {
-  generateProductDescription,
-  type GenerateProductDescriptionInput,
-} from "@/ai/ai-product-description";
+import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { SelectField } from "@/components/ui/select-field";
@@ -35,7 +31,7 @@ export function ProductForm({ onSubmit, initialData, onCancel }: ProductFormProp
   const [price, setPrice] = useState(initialData?.price || 0);
   const [stock, setStock] = useState(initialData?.stock || 0);
   const [images, setImages] = useState<string[]>(initialData?.images || []);
-  const [categoryId, setCategoryId] = useState(initialData?.categoryId?.toString() || "");
+  const [categoryId, setCategoryId] = useState(initialData?.categoryId ? String(initialData.categoryId) : "");
   const [categories, setCategories] = useState<Category[]>([]);
 
   useEffect(() => {
@@ -58,22 +54,6 @@ export function ProductForm({ onSubmit, initialData, onCancel }: ProductFormProp
     e.preventDefault();
     onSubmit({ name, description, price, stock, images, categoryId });
   };
-
-  async function handleGenerateDescription() {
-    try {
-      const input: GenerateProductDescriptionInput = {
-        attributes: "organic, non-gmo, sustainably-sourced",
-        keywords: "turmeric, spice, health, antioxidant",
-        style: "Informative and appealing",
-      };
-      const result = await generateProductDescription(input);
-      if (result.description) {
-        setDescription(result.description);
-      }
-    } catch (error) {
-      console.error("Failed to generate description:", error);
-    }
-  }
 
   const handleImageChange = (index: number, value: string) => {
     const newImages = [...images];
@@ -135,23 +115,12 @@ export function ProductForm({ onSubmit, initialData, onCancel }: ProductFormProp
         </div>
         <div className="space-y-2">
           <label htmlFor="description">Description</label>
-          <div className="relative">
-            <Textarea
-              id="description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Product Description"
-            />
-            <Button
-              type="button"
-              className="absolute bottom-2 right-2 h-7 w-7"
-              size="icon"
-              onClick={handleGenerateDescription}
-            >
-              <Bot className="h-4 w-4" />
-              <span className="sr-only">Generate with AI</span>
-            </Button>
-          </div>
+          <Textarea
+            id="description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="Product Description"
+          />
         </div>
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
