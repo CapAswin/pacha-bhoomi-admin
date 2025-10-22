@@ -54,7 +54,7 @@ export const columns: ColumnDef<Category>[] = [
         className="flex items-center gap-2"
         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
       >
-        Date
+        Created Date
         <ArrowUpDown className="ml-2 h-4 w-4" />
       </button>
     ),
@@ -67,7 +67,35 @@ export const columns: ColumnDef<Category>[] = [
       if (isNaN(date.getTime())) {
         return <div>-</div>;
       }
-      const formattedDate = new Intl.DateTimeFormat("en-US").format(date);
+      const formattedDate = new Intl.DateTimeFormat("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      }).format(date);
+      return <div>{formattedDate}</div>;
+    },
+  },
+  {
+    accessorKey: "modifiedAt",
+    header: "Last Modified",
+    cell: ({ row }) => {
+      const modifiedAt = row.getValue("modifiedAt");
+      if (!modifiedAt) {
+        return <div>-</div>;
+      }
+      const date = new Date(modifiedAt as string);
+      if (isNaN(date.getTime())) {
+        return <div>-</div>;
+      }
+      const formattedDate = new Intl.DateTimeFormat("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      }).format(date);
       return <div>{formattedDate}</div>;
     },
   },

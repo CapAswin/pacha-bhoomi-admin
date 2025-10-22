@@ -93,8 +93,15 @@ export default function CategoriesPage() {
 
   const handleEdit = async (id: string, values: Omit<Category, "id">) => {
     try {
-      const updatedCategory = await updateCategory(id, values);
-      setCategories(categories.map((c) => (c.id === id ? updatedCategory : c)));
+      await updateCategory(id, values);
+      // After update, refresh the entire list to ensure proper sorting
+      const refreshedData = await getCategories();
+      const sortedData = [...refreshedData].sort((a, b) => {
+        const dateA = a?.createdAt ? new Date(a.createdAt).getTime() : 0;
+        const dateB = b?.createdAt ? new Date(b.createdAt).getTime() : 0;
+        return dateB - dateA;
+      });
+      setCategories(sortedData);
     } catch (error) {
       console.error(error);
     }

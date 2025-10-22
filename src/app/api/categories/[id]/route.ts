@@ -47,12 +47,20 @@ export async function PUT(
     const db = await getDb();
     const resolvedParams = await params;
     const categoryData = await request.json();
-    const result = await db
-      .collection("categories")
-      .updateOne(
-        { _id: new ObjectId(resolvedParams.id) },
-        { $set: categoryData }
-      );
+
+    // Remove createdAt from update data to prevent it from being overwritten
+    const updateData = { ...categoryData };
+    delete updateData.createdAt;
+
+    const result = await db.collection("categories").updateOne(
+      { _id: new ObjectId(resolvedParams.id) },
+      {
+        $set: {
+          ...updateData,
+          modifiedAt: new Date().toISOString(),
+        },
+      }
+    );
     if (result.matchedCount === 0) {
       return NextResponse.json(
         { message: "Category not found" },

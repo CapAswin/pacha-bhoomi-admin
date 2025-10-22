@@ -39,6 +39,7 @@ export async function POST(request: Request) {
       name: categoryData.name,
       description: categoryData.description,
       createdAt: new Date().toISOString(),
+      modifiedAt: null,
     });
     const insertedCategory = {
       id: result.insertedId.toString(),

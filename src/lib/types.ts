@@ -5,6 +5,7 @@ export const categorySchema = z.object({
   name: z.string(),
   description: z.string().optional(),
   createdAt: z.string(),
+  modifiedAt: z.string().optional(),
 });
 
 export type Category = z.infer<typeof categorySchema>;
