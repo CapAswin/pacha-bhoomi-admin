@@ -21,6 +21,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { useModal } from "@/context/modal-context";
+import type { Category } from "@/lib/types";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -35,6 +38,7 @@ export function DataTable<TData, TValue>({
   data,
   meta,
 }: DataTableProps<TData, TValue>) {
+  const { openModal } = useModal();
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [rowSelection, setRowSelection] = React.useState({});
   const [globalFilter, setGlobalFilter] = React.useState("");
@@ -57,15 +61,41 @@ export function DataTable<TData, TValue>({
     },
   });
 
+  const selectedRows = table.getFilteredSelectedRowModel().rows;
+  const hasSelectedRows = selectedRows.length > 0;
+
   return (
     <div className="space-y-4">
-      <div className="flex items-center">
+      <div className="flex items-center justify-between">
         <Input
           placeholder="Filter categories..."
           value={globalFilter ?? ""}
           onChange={(event) => setGlobalFilter(event.target.value)}
           className="max-w-sm"
         />
+        {hasSelectedRows && (
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-muted-foreground">
+              {selectedRows.length} selected
+            </span>
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={() => {
+                // Use modal instead of direct delete
+                openModal("confirmDeleteCategories", {
+                  categories: selectedRows.map(
+                    (row) => row.original as Category
+                  ),
+                  count: selectedRows.length,
+                });
+                table.resetRowSelection();
+              }}
+            >
+              Delete Selected
+            </Button>
+          </div>
+        )}
       </div>
       <div className="rounded-md border">
         <Table>

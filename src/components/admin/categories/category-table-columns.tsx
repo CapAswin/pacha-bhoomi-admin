@@ -6,6 +6,32 @@ import { CategoryActions } from "@/components/admin/categories/category-actions"
 
 export const columns: ColumnDef<Category>[] = [
   {
+    id: "select",
+    header: ({ table }) => (
+      <input
+        type="checkbox"
+        checked={table.getIsAllPageRowsSelected()}
+        onChange={(e) => table.toggleAllPageRowsSelected(!!e.target.checked)}
+        aria-label="Select all"
+        ref={(el) => {
+          if (el) {
+            el.indeterminate = table.getIsSomePageRowsSelected();
+          }
+        }}
+      />
+    ),
+    cell: ({ row }) => (
+      <input
+        type="checkbox"
+        checked={row.getIsSelected()}
+        onChange={(e) => row.toggleSelected(!!e.target.checked)}
+        aria-label="Select row"
+      />
+    ),
+    enableSorting: false,
+    enableHiding: false,
+  },
+  {
     accessorKey: "name",
     header: ({ column }) => (
       <button

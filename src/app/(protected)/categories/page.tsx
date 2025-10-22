@@ -53,12 +53,12 @@ async function updateCategory(
   return await response.json();
 }
 
-async function deleteCategory(id: string): Promise<void> {
-  const response = await fetch(`/api/categories/${id}`, {
+async function deleteCategory(ids: string): Promise<void> {
+  const response = await fetch(`/api/categories/${ids}`, {
     method: "DELETE",
   });
   if (!response.ok) {
-    throw new Error("Failed to delete category");
+    throw new Error("Failed to delete categories");
   }
 }
 
@@ -100,10 +100,11 @@ export default function CategoriesPage() {
     }
   };
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async (ids: string) => {
     try {
-      await deleteCategory(id);
-      setCategories(categories.filter((c) => c.id !== id));
+      await deleteCategory(ids);
+      const idArray = ids.split(",");
+      setCategories(categories.filter((c) => !idArray.includes(c.id)));
     } catch (error) {
       console.error(error);
     }
@@ -130,7 +131,13 @@ export default function CategoriesPage() {
             Create Category
           </Button>
         </div>
-        <DataTable data={categories} columns={columns} />
+        <DataTable
+          data={categories}
+          columns={columns}
+          meta={{
+            onDelete: handleDelete,
+          }}
+        />
       </div>
     </>
   );
