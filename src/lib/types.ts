@@ -1,5 +1,3 @@
-
-import { ObjectId } from 'mongodb';
 import { z } from 'zod';
 
 export const categorySchema = z.object({
@@ -12,8 +10,7 @@ export type Category = z.infer<typeof categorySchema>;
 
 
 export const productSchema = z.object({
-  id: z.string().optional(),
-  _id: z.instanceof(ObjectId).optional(),
+  id: z.string(),
   name: z.string(),
   price: z.number(),
   stock: z.number(),
@@ -21,7 +18,7 @@ export const productSchema = z.object({
   description: z.string().optional(),
   images: z.array(z.string()).default(["/placeholder.svg"]),
   createdAt: z.string(),
-  categoryId: z.instanceof(ObjectId).nullable(),
+  categoryId: z.string().nullable(),
 });
 
 
