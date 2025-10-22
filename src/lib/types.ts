@@ -1,3 +1,5 @@
+
+import { ObjectId } from 'mongodb';
 import { z } from 'zod';
 
 export const categorySchema = z.object({
@@ -8,17 +10,21 @@ export const categorySchema = z.object({
 
 export type Category = z.infer<typeof categorySchema>;
 
-export type Product = {
-  id: string;
-  name: string;
-  price: number;
-  stock: number;
-  status: 'in stock' | 'low stock' | 'out of stock';
-  description: string;
-  images: string[];
-  createdAt: string;
-  categoryId:string;
-};
+
+export const productSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  price: z.number(),
+  stock: z.number(),
+  status: z.enum(['in stock', 'low stock', 'out of stock']),
+  description: z.string(),
+  images: z.array(z.string()),
+  createdAt: z.string(),
+  categoryId: z.union([z.string(), z.instanceof(ObjectId)]),
+});
+
+export type Product = z.infer<typeof productSchema>;
+
 
 export type Order = {
   id: string;
