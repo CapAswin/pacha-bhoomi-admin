@@ -80,7 +80,11 @@
   }
   body {
     @apply bg-background text-foreground;
-    background-image: radial-gradient(circle at top right, hsl(var(--primary) / 0.1), transparent 40%);
+    background-image: radial-gradient(
+      circle at top right,
+      hsl(var(--primary) / 0.1),
+      transparent 40%
+    );
   }
 }
 
@@ -100,4 +104,19 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+@keyframes slide-in-up {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-in-up {
+  animation: slide-in-up 0.5s ease-out;
 }

@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import * as React from 'react';
+import * as React from "react";
 import {
   type ColumnDef,
   type SortingState,
@@ -10,8 +10,8 @@ import {
   getSortedRowModel,
   getFilteredRowModel,
   useReactTable,
-} from '@tanstack/react-table';
-import { DataTablePagination } from '@/components/data-table/data-table-pagination';
+} from "@tanstack/react-table";
+import { DataTablePagination } from "@/components/data-table/data-table-pagination";
 import {
   Table,
   TableBody,
@@ -19,7 +19,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
+} from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 
 interface DataTableProps<TData, TValue> {
@@ -27,17 +27,17 @@ interface DataTableProps<TData, TValue> {
   data: TData[];
   meta?: {
     onDelete: (id: string) => void;
-  }
+  };
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
-  meta
+  meta,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [rowSelection, setRowSelection] = React.useState({});
-  const [globalFilter, setGlobalFilter] = React.useState('');
+  const [globalFilter, setGlobalFilter] = React.useState("");
 
   const table = useReactTable({
     data,
@@ -59,13 +59,11 @@ export function DataTable<TData, TValue>({
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-         <Input
+      <div className="flex items-center">
+        <Input
           placeholder="Filter categories..."
-          value={globalFilter ?? ''}
-          onChange={(event) =>
-            setGlobalFilter(event.target.value)
-          }
+          value={globalFilter ?? ""}
+          onChange={(event) => setGlobalFilter(event.target.value)}
           className="max-w-sm"
         />
       </div>
@@ -94,7 +92,7 @@ export function DataTable<TData, TValue>({
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
-                  data-state={row.getIsSelected() && 'selected'}
+                  data-state={row.getIsSelected() && "selected"}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>

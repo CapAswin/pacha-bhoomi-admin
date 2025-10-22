@@ -16,24 +16,19 @@ export default function CustomersPage() {
           Customers
         </h1>
       </div>
-      <div
-        className="border rounded-lg bg-card text-card-foreground shadow-sm glassmorphism animate-slide-in-up"
-        style={{ animationDelay: "200ms" }}
-      >
-        <div className="flex flex-col space-y-1.5 p-6">
-          <h3 className="text-2xl font-semibold leading-none tracking-tight font-headline">
-            Customer List
-          </h3>
-          <p className="text-sm text-muted-foreground">
-            View and manage your customer base.
-          </p>
+      <div className="hidden h-full flex-1 flex-col space-y-8 p-8 md:flex">
+        <div className="flex items-center justify-between space-y-2">
+          <div>
+            <h2 className="text-2xl font-bold tracking-tight">Customers</h2>
+            <p className="text-muted-foreground">
+              Here&apos;s a list of your customers.
+            </p>
+          </div>
         </div>
-        <div className="p-6 pt-0">
-          <CustomerTable
-            columns={columns(handleResetPassword)}
-            data={customers}
-          />
-        </div>
+        <CustomerTable
+          columns={columns(handleResetPassword)}
+          data={customers}
+        />
       </div>
     </>
   );
