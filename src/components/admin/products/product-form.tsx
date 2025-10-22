@@ -35,7 +35,7 @@ export function ProductForm({ onSubmit, initialData, onCancel }: ProductFormProp
   const [price, setPrice] = useState(initialData?.price || 0);
   const [stock, setStock] = useState(initialData?.stock || 0);
   const [images, setImages] = useState<string[]>(initialData?.images || []);
-  const [categoryId, setCategoryId] = useState(initialData?.categoryId || "");
+  const [categoryId, setCategoryId] = useState(initialData?.categoryId?.toString() || "");
   const [categories, setCategories] = useState<Category[]>([]);
 
   useEffect(() => {
