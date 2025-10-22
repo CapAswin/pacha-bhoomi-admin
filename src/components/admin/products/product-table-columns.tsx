@@ -27,6 +27,10 @@ export const columns: ColumnDef<Product>[] = [
     ),
   },
   {
+    accessorKey: 'category.name',
+    header: 'Category',
+  },
+  {
     accessorKey: 'status',
     header: 'Status',
   },

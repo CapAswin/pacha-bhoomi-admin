@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState } from "react";
-import { Product } from "@/lib/types";
+import React, { useState, useEffect } from "react";
+import { Product, Category } from "@/lib/types";
 import { Textarea } from "@/components/ui/textarea";
 import { Bot, X } from "lucide-react";
 import {
@@ -10,6 +10,7 @@ import {
 } from "@/ai/ai-product-description";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export type ProductFormValues = {
   name: string;
@@ -17,6 +18,7 @@ export type ProductFormValues = {
   price: number;
   stock: number;
   images: string[];
+  categoryId: string;
 };
 
 interface ProductFormProps {
@@ -33,10 +35,28 @@ export function ProductForm({ onSubmit, initialData, onCancel }: ProductFormProp
   const [price, setPrice] = useState(initialData?.price || 0);
   const [stock, setStock] = useState(initialData?.stock || 0);
   const [images, setImages] = useState<string[]>(initialData?.images || []);
+  const [categoryId, setCategoryId] = useState(initialData?.categoryId || "");
+  const [categories, setCategories] = useState<Category[]>([]);
+
+  useEffect(() => {
+    async function fetchCategories() {
+      try {
+        const response = await fetch("/api/categories");
+        if (!response.ok) {
+          throw new Error("Failed to fetch categories");
+        }
+        const data = await response.json();
+        setCategories(data);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+    fetchCategories();
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit({ name, description, price, stock, images });
+    onSubmit({ name, description, price, stock, images, categoryId });
   };
 
   async function handleGenerateDescription() {
@@ -81,6 +101,21 @@ export function ProductForm({ onSubmit, initialData, onCancel }: ProductFormProp
             onChange={(e) => setName(e.target.value)}
             placeholder="Product Name"
           />
+        </div>
+        <div className="space-y-2">
+          <label htmlFor="category">Category</label>
+          <Select onValueChange={setCategoryId} defaultValue={categoryId}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select a category" />
+            </SelectTrigger>
+            <SelectContent>
+              {categories.map((category) => (
+                <SelectItem key={category.id} value={category.id}>
+                  {category.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
         <div className="space-y-2">
           <label>Image URLs</label>

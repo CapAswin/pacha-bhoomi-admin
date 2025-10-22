@@ -32,12 +32,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
     try {
         const db = await getDb();
-        const result = await db.collection('products').deleteOne({ _id: new ObjectId(params.id) });
-
-        if (result.deletedCount === 0) {
-            // This is the source of the client-side error
-            return new NextResponse('Product not found', { status: 404 });
-        }
+        await db.collection('products').deleteOne({ _id: new ObjectId(params.id) });
 
         return new NextResponse(null, { status: 204 });
     } catch (error) {

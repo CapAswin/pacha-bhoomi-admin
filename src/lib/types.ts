@@ -17,6 +17,7 @@ export type Product = {
   description: string;
   images: string[];
   createdAt: string;
+  categoryId:string;
 };
 
 export type Order = {
