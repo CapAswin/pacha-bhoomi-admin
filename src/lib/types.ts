@@ -4,7 +4,7 @@ export const categorySchema = z.object({
   id: z.string(),
   name: z.string(),
   description: z.string().optional(),
-  createdAt: z.string(),
+  createdAt: z.string().optional(),
   modifiedAt: z.string().optional(),
 });
 

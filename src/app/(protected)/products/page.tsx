@@ -105,8 +105,17 @@ export default function ProductsPage() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["products"] }),
   });
 
-  const handleAddProduct = async (productData: ProductFormValues) => {
-    await addMutation.mutateAsync(productData);
+  const handleAddProduct = async (
+    productData: ProductFormValues,
+    id?: string
+  ) => {
+    if (id) {
+      // Edit mode
+      await editMutation.mutateAsync({ id, data: productData });
+    } else {
+      // Create mode
+      await addMutation.mutateAsync(productData);
+    }
   };
 
   const handleEditProduct = async (

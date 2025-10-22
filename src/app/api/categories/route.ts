@@ -38,7 +38,7 @@ export async function POST(request: Request) {
     const result = await db.collection("categories").insertOne({
       name: categoryData.name,
       description: categoryData.description,
-      createdAt: new Date().toISOString(),
+      createdAt: categoryData.createdAt || new Date().toISOString(),
       modifiedAt: null,
     });
     const insertedCategory = {

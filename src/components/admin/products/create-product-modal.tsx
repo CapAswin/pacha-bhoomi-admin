@@ -11,28 +11,45 @@ import {
 } from "@/components/ui/dialog";
 
 interface CreateProductModalProps {
-  onSave: (data: ProductFormValues) => void;
+  onSave: (data: ProductFormValues, id?: string) => void;
 }
 
 export function CreateProductModal({ onSave }: CreateProductModalProps) {
   const { modal, closeModal } = useModal();
 
-  if (modal?.type !== "createProduct") {
+  if (modal?.type !== "createProduct" && modal?.type !== "editProduct") {
     return null;
   }
 
+  const isEdit = modal.type === "editProduct";
+  const product = isEdit ? (modal.data as { product: any }).product : null;
+
   const handleSave = (data: ProductFormValues) => {
-    onSave(data);
+    if (isEdit && product) {
+      // For edit, pass the id separately
+      onSave(data, product.id);
+    } else {
+      onSave(data);
+    }
     closeModal();
   };
 
   return (
-    <Dialog open={modal?.type === "createProduct"} onOpenChange={closeModal}>
+    <Dialog
+      open={modal?.type === "createProduct" || modal?.type === "editProduct"}
+      onOpenChange={closeModal}
+    >
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Create New Product</DialogTitle>
+          <DialogTitle>
+            {isEdit ? "Edit Product" : "Create New Product"}
+          </DialogTitle>
         </DialogHeader>
-        <ProductForm onSubmit={handleSave} onCancel={closeModal} />
+        <ProductForm
+          onSubmit={handleSave}
+          onCancel={closeModal}
+          initialData={isEdit ? product : undefined}
+        />
       </DialogContent>
     </Dialog>
   );

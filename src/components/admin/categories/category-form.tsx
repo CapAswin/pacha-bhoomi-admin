@@ -24,7 +24,13 @@ export function CategoryForm({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit({ name, description, createdAt: new Date().toISOString() });
+    if (initialData) {
+      // Edit mode - don't include createdAt
+      onSubmit({ name, description });
+    } else {
+      // Create mode - include createdAt
+      onSubmit({ name, description, createdAt: new Date().toISOString() });
+    }
   };
 
   return (
