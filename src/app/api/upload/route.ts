@@ -20,20 +20,24 @@ export async function POST(request: NextRequest) {
 
     // Get productId from form data
     const productId = data.get("productId") as string;
-    if (!productId) {
+    const tempUpload = data.get("tempUpload") as string;
+
+    if (!tempUpload && !productId) {
       return NextResponse.json(
         { success: false, message: "Product ID is required." },
         { status: 400 }
       );
     }
 
-    // Create product-specific directory
+    // Create product-specific directory (use temp directory for temp uploads)
+    const uploadDir = tempUpload ? "temp" : "products";
+    const dirId = tempUpload ? Date.now().toString() : productId;
     const productDir = path.join(
       process.cwd(),
       "public",
       "uploads",
-      "products",
-      productId
+      uploadDir,
+      dirId
     );
     await mkdir(productDir, { recursive: true });
 
@@ -61,12 +65,14 @@ export async function POST(request: NextRequest) {
     await writeFile(filepath, buffer);
 
     // Return the public URL path
-    const imageUrl = `/uploads/products/${productId}/${filename}`;
+    const imageUrl = tempUpload
+      ? `/uploads/temp/${dirId}/${filename}`
+      : `/uploads/products/${productId}/${filename}`;
 
     return NextResponse.json({
       success: true,
       imageUrl,
-      tempProductId: productId,
+      tempId: tempUpload ? dirId : null,
       message: "File uploaded successfully.",
     });
   } catch (error) {

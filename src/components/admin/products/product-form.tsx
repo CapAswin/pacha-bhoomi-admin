@@ -15,10 +15,11 @@ export type ProductFormValues = {
   stock: number;
   images: string[];
   categoryId: string | undefined;
+  removedImages?: string[];
 };
 
 interface ProductFormProps {
-  onSubmit: (values: ProductFormValues) => void;
+  onSubmit: (values: ProductFormValues, pendingFiles?: (File | null)[]) => void;
   initialData?: Product | null;
   onCancel?: () => void;
 }
@@ -40,7 +41,9 @@ export function ProductForm({
   );
   const [categories, setCategories] = useState<Category[]>([]);
   const [isUploading, setIsUploading] = useState(false);
-  const [tempProductId, setTempProductId] = useState<string>("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [pendingFiles, setPendingFiles] = useState<(File | null)[]>([]);
+  const [removedImages, setRemovedImages] = useState<string[]>([]);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
 
   useEffect(() => {
@@ -59,16 +62,27 @@ export function ProductForm({
     fetchCategories();
   }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit({
-      name,
-      description,
-      price,
-      stock,
-      images,
-      categoryId: categoryId || "",
-    });
+    setIsSubmitting(true);
+
+    try {
+      // Upload pending files after successful product creation
+      await onSubmit(
+        {
+          name,
+          description,
+          price,
+          stock,
+          images,
+          categoryId: categoryId || "",
+          removedImages,
+        },
+        pendingFiles
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleImageChange = (index: number, value: string) => {
@@ -84,8 +98,25 @@ export function ProductForm({
   };
 
   const removeImageInput = (index: number) => {
+    const imageToRemove = images[index];
     const newImages = images.filter((_, i) => i !== index);
+    const newPendingFiles = pendingFiles.filter((_, i) => i !== index);
     setImages(newImages);
+    setPendingFiles(newPendingFiles);
+
+    // If this is an existing image (not a blob URL), track it for deletion
+    if (
+      imageToRemove &&
+      !imageToRemove.startsWith("blob:") &&
+      imageToRemove.startsWith("/uploads/")
+    ) {
+      setRemovedImages([...removedImages, imageToRemove]);
+    }
+
+    // Clean up object URL if it's a blob URL
+    if (imageToRemove?.startsWith("blob:")) {
+      URL.revokeObjectURL(imageToRemove);
+    }
   };
 
   const handleDragStart = (index: number) => {
@@ -125,52 +156,14 @@ export function ProductForm({
       return;
     }
 
-    setIsUploading(true);
+    // Create object URL for instant preview
+    const previewUrl = URL.createObjectURL(file);
 
-    // Generate a temporary product ID for new products
-    let productId = initialData?.id;
-    if (!productId) {
-      if (!tempProductId) {
-        const newTempId = Date.now().toString();
-        setTempProductId(newTempId);
-        productId = newTempId;
-      } else {
-        productId = tempProductId;
-      }
-    }
+    // Store file for later upload
+    setPendingFiles([...pendingFiles, file]);
+    setImages([...images, previewUrl]);
 
-    try {
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("productId", productId);
-
-      const response = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
-      });
-
-      const result = await response.json();
-
-      if (result.success) {
-        setImages([...images, result.imageUrl]);
-        // Update tempProductId if this was for a new product and we got a new ID back
-        if (
-          !initialData?.id &&
-          result.tempProductId &&
-          result.tempProductId !== tempProductId
-        ) {
-          setTempProductId(result.tempProductId);
-        }
-      } else {
-        console.error("Upload failed:", result.message);
-      }
-    } catch (error) {
-      console.error("Upload error:", error);
-    } finally {
-      setIsUploading(false);
-      // Clear the input value to allow re-uploading the same file
-      event.target.value = "";
-    }
+    event.target.value = "";
   };
 
   return (
@@ -212,7 +205,7 @@ export function ProductForm({
                 onDragEnd={handleDragEnd}
               >
                 <GripVertical className="h-4 w-4 text-gray-400 cursor-move" />
-                {image.startsWith("/uploads/") ? (
+                {image.startsWith("/uploads/") || image.startsWith("blob:") ? (
                   <div className="flex items-center gap-2 flex-1">
                     <img
                       src={image}
@@ -221,14 +214,16 @@ export function ProductForm({
                     />
                     <span
                       className="text-sm text-gray-600 flex-1 truncate"
-                      title={image.split("/").pop()}
+                      title={image.split("/").pop() || "Uploaded image"}
                     >
                       {index === 0 && (
                         <span className="text-green-600 font-medium mr-1">
                           (Primary)
                         </span>
                       )}
-                      {image.split("/").pop()?.substring(0, 20)}...
+                      {image.startsWith("blob:")
+                        ? "New image preview"
+                        : image.split("/").pop()?.substring(0, 20) + "..."}
                     </span>
                   </div>
                 ) : (
@@ -317,8 +312,17 @@ export function ProductForm({
             Cancel
           </Button>
         )}
-        <Button type="submit">
-          {initialData ? "Save Changes" : "Create Product"}
+        <Button type="submit" disabled={isUploading || isSubmitting}>
+          {isSubmitting ? (
+            <>
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+              {initialData ? "Saving..." : "Creating..."}
+            </>
+          ) : initialData ? (
+            "Save Changes"
+          ) : (
+            "Create Product"
+          )}
         </Button>
       </div>
     </form>

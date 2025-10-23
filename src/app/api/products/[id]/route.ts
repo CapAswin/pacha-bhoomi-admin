@@ -17,7 +17,29 @@ export async function PUT(
     const resolvedParams = await params;
     const db = await getDb();
     const productData = await request.json();
-    const { name, description, price, stock, images, categoryId } = productData;
+    const {
+      name,
+      description,
+      price,
+      stock,
+      images,
+      categoryId,
+      removedImages,
+    } = productData;
+
+    // Delete removed images from filesystem
+    if (removedImages && Array.isArray(removedImages)) {
+      for (const imagePath of removedImages) {
+        if (imagePath.startsWith("/uploads/products/")) {
+          try {
+            const fullPath = path.join(process.cwd(), "public", imagePath);
+            await unlink(fullPath);
+          } catch (error) {
+            console.warn(`Failed to delete image file: ${imagePath}`, error);
+          }
+        }
+      }
+    }
 
     const result = await db.collection("products").updateOne(
       { _id: new ObjectId(resolvedParams.id) },

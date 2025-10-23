@@ -11,7 +11,11 @@ import {
 } from "@/components/ui/dialog";
 
 interface CreateProductModalProps {
-  onSave: (data: ProductFormValues, id?: string) => void;
+  onSave: (
+    data: ProductFormValues,
+    pendingFiles?: (File | null)[],
+    id?: string
+  ) => void;
 }
 
 export function CreateProductModal({ onSave }: CreateProductModalProps) {
@@ -24,12 +28,15 @@ export function CreateProductModal({ onSave }: CreateProductModalProps) {
   const isEdit = modal.type === "editProduct";
   const product = isEdit ? (modal.data as { product: any }).product : null;
 
-  const handleSave = (data: ProductFormValues) => {
+  const handleSave = (
+    data: ProductFormValues,
+    pendingFiles?: (File | null)[]
+  ) => {
     if (isEdit && product) {
       // For edit, pass the id separately
-      onSave(data, product.id);
+      onSave(data, pendingFiles, product.id);
     } else {
-      onSave(data);
+      onSave(data, pendingFiles);
     }
     closeModal();
   };

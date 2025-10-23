@@ -28,11 +28,43 @@ async function fetchCategories(): Promise<Category[]> {
   return response.json();
 }
 
-async function addProduct(newProduct: ProductFormValues): Promise<Product> {
+async function addProduct(
+  newProduct: ProductFormValues,
+  pendingFiles?: (File | null)[]
+): Promise<Product> {
+  let productData = { ...newProduct };
+
+  // Upload pending files first
+  if (pendingFiles && pendingFiles.length > 0) {
+    const uploadedUrls: string[] = [];
+    for (const file of pendingFiles) {
+      if (file) {
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("tempUpload", "true");
+
+        const uploadResponse = await fetch("/api/upload", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (uploadResponse.ok) {
+          const uploadResult = await uploadResponse.json();
+          uploadedUrls.push(uploadResult.imageUrl);
+        }
+      }
+    }
+
+    // Replace blob URLs with uploaded URLs
+    productData.images = productData.images.map((img, index) =>
+      img.startsWith("blob:") ? uploadedUrls[index] || img : img
+    );
+  }
+
   const response = await fetch("/api/products", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(newProduct),
+    body: JSON.stringify(productData),
   });
   if (!response.ok) throw new Error("Failed to add product");
   return response.json();
@@ -41,6 +73,7 @@ async function addProduct(newProduct: ProductFormValues): Promise<Product> {
 async function editProduct(updatedProduct: {
   id: string;
   data: ProductFormValues;
+  pendingFiles?: (File | null)[];
 }): Promise<Product> {
   const response = await fetch(`/api/products/${updatedProduct.id}`, {
     method: "PUT",
@@ -48,7 +81,50 @@ async function editProduct(updatedProduct: {
     body: JSON.stringify(updatedProduct.data),
   });
   if (!response.ok) throw new Error("Failed to edit product");
-  return response.json();
+
+  const result = await response.json();
+
+  // Upload any new pending files after successful update
+  if (updatedProduct.pendingFiles && updatedProduct.pendingFiles.length > 0) {
+    const uploadPromises = updatedProduct.pendingFiles.map(
+      async (file, index) => {
+        if (!file) return null;
+
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("productId", updatedProduct.id);
+
+        const uploadResponse = await fetch("/api/upload", {
+          method: "POST",
+          body: formData,
+        });
+
+        const uploadResult = await uploadResponse.json();
+        return uploadResult.success ? uploadResult.imageUrl : null;
+      }
+    );
+
+    const uploadedUrls = await Promise.all(uploadPromises);
+    const finalImages = uploadedUrls.filter((url) => url !== null);
+
+    if (finalImages.length > 0) {
+      // Update product with final image URLs, removing blob URLs
+      const updatedImages = updatedProduct.data.images.map((img, idx) =>
+        img.startsWith("blob:") ? finalImages.shift() || img : img
+      );
+
+      await fetch(`/api/products/${updatedProduct.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...updatedProduct.data,
+          images: updatedImages,
+        }),
+      });
+    }
+  }
+
+  return result;
 }
 
 async function deleteProduct(productId: string): Promise<void> {
@@ -94,7 +170,13 @@ export default function ProductsPage() {
   }, [productList]);
 
   const addMutation = useMutation({
-    mutationFn: addProduct,
+    mutationFn: ({
+      productData,
+      pendingFiles,
+    }: {
+      productData: ProductFormValues;
+      pendingFiles?: (File | null)[];
+    }) => addProduct(productData, pendingFiles),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["products"] }),
   });
 
@@ -110,14 +192,15 @@ export default function ProductsPage() {
 
   const handleAddProduct = async (
     productData: ProductFormValues,
+    pendingFiles?: (File | null)[],
     id?: string
   ) => {
     if (id) {
       // Edit mode
-      await editMutation.mutateAsync({ id, data: productData });
+      await editMutation.mutateAsync({ id, data: productData, pendingFiles });
     } else {
       // Create mode
-      await addMutation.mutateAsync(productData);
+      await addMutation.mutateAsync({ productData, pendingFiles });
     }
   };
 
