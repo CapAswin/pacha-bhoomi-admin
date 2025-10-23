@@ -2,10 +2,8 @@
 
 import React from "react";
 import { PlusCircle, Calendar as CalendarIcon, X } from "lucide-react";
-import { promotions } from "@/lib/data";
-import { format } from "date-fns";
 import { PromotionTable } from "@/components/admin/promotions/promotion-table";
-import { columns } from "@/components/admin/promotions/promotion-table-columns";
+import { createColumns } from "@/components/admin/promotions/promotion-table-columns";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -14,12 +12,147 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import type { Promotion } from "@/lib/types";
 
 export default function PromotionsPage() {
-  const [startDate, setStartDate] = React.useState<Date | undefined>();
-  const [endDate, setEndDate] = React.useState<Date | undefined>();
+  const [promotions, setPromotions] = React.useState<Promotion[]>([]);
+  const [loading, setLoading] = React.useState(true);
   const [isModalOpen, setIsModalOpen] = React.useState(false);
-  const [promotionType, setPromotionType] = React.useState<string>("");
+  const [editingPromotion, setEditingPromotion] =
+    React.useState<Promotion | null>(null);
+  const [formData, setFormData] = React.useState({
+    code: "",
+    type: "",
+    value: "",
+    startDate: "",
+    endDate: "",
+  });
+
+  const fetchPromotions = async () => {
+    try {
+      const response = await fetch("/api/promotions");
+      if (response.ok) {
+        const data = await response.json();
+        setPromotions(data);
+      }
+    } catch (error) {
+      console.error("Error fetching promotions:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  React.useEffect(() => {
+    fetchPromotions();
+  }, []);
+
+  const handleCreatePromotion = () => {
+    setEditingPromotion(null);
+    setFormData({
+      code: "",
+      type: "",
+      value: "",
+      startDate: "",
+      endDate: "",
+    });
+    setIsModalOpen(true);
+  };
+
+  const handleEditPromotion = (promotion: Promotion) => {
+    setEditingPromotion(promotion);
+    setFormData({
+      code: promotion.code,
+      type: promotion.type,
+      value: promotion.value,
+      startDate: promotion.startDate,
+      endDate: promotion.endDate,
+    });
+    setIsModalOpen(true);
+  };
+
+  const handleDeletePromotion = async (promotion: Promotion) => {
+    if (
+      !confirm(`Are you sure you want to delete promotion "${promotion.code}"?`)
+    ) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/promotions/${promotion.id}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        setPromotions(promotions.filter((p) => p.id !== promotion.id));
+      } else {
+        alert("Failed to delete promotion");
+      }
+    } catch (error) {
+      console.error("Error deleting promotion:", error);
+      alert("Error deleting promotion");
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const promotionData = {
+      ...formData,
+      status: "Active" as const,
+    };
+
+    try {
+      const url = editingPromotion
+        ? `/api/promotions/${editingPromotion.id}`
+        : "/api/promotions";
+      const method = editingPromotion ? "PUT" : "POST";
+
+      const response = await fetch(url, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(promotionData),
+      });
+
+      if (response.ok) {
+        const savedPromotion = await response.json();
+        if (editingPromotion) {
+          setPromotions(
+            promotions.map((p) =>
+              p.id === editingPromotion.id ? savedPromotion : p
+            )
+          );
+        } else {
+          setPromotions([...promotions, savedPromotion]);
+        }
+        setIsModalOpen(false);
+      } else {
+        alert("Failed to save promotion");
+      }
+    } catch (error) {
+      console.error("Error saving promotion:", error);
+      alert("Error saving promotion");
+    }
+  };
+
+  const columns = createColumns({
+    onEdit: handleEditPromotion,
+    onDelete: handleDeletePromotion,
+  });
+
+  if (loading) {
+    return (
+      <div className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6 bg-background overflow-auto">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-2xl font-bold tracking-tight">Promotions</h2>
+            <p className="text-muted-foreground">Loading promotions...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -31,7 +164,7 @@ export default function PromotionsPage() {
               Here's a list of your promotions.
             </p>
           </div>
-          <Button onClick={() => setIsModalOpen(true)}>Create Promotion</Button>
+          <Button onClick={handleCreatePromotion}>Create Promotion</Button>
         </div>
 
         {isModalOpen && (
@@ -46,13 +179,14 @@ export default function PromotionsPage() {
               </button>
               <div className="flex flex-col space-y-1.5 text-center sm:text-left">
                 <h2 className="text-lg font-semibold leading-none tracking-tight">
-                  Create Promotion
+                  {editingPromotion ? "Edit Promotion" : "Create Promotion"}
                 </h2>
                 <p className="text-sm text-muted-foreground">
-                  Fill in the details for the new promotion.
+                  Fill in the details for the{" "}
+                  {editingPromotion ? "updated" : "new"} promotion.
                 </p>
               </div>
-              <div className="grid gap-6 py-4">
+              <form onSubmit={handleSubmit} className="grid gap-6 py-4">
                 <div className="space-y-2">
                   <label
                     htmlFor="code"
@@ -62,8 +196,12 @@ export default function PromotionsPage() {
                   </label>
                   <input
                     id="code"
-                    defaultValue="SUMMER25"
+                    value={formData.code}
+                    onChange={(e) =>
+                      setFormData({ ...formData, code: e.target.value })
+                    }
                     className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base md:text-sm"
+                    required
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
@@ -74,14 +212,23 @@ export default function PromotionsPage() {
                     >
                       Type
                     </label>
-                    <Select onValueChange={setPromotionType}>
+                    <Select
+                      value={formData.type}
+                      onValueChange={(value) =>
+                        setFormData({ ...formData, type: value })
+                      }
+                    >
                       <SelectTrigger className="w-full">
                         <SelectValue placeholder="Select type" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="percentage">Percentage</SelectItem>
-                        <SelectItem value="fixed">Fixed Amount</SelectItem>
-                        <SelectItem value="shipping">Free Shipping</SelectItem>
+                        <SelectItem value="Percentage">Percentage</SelectItem>
+                        <SelectItem value="Fixed Amount">
+                          Fixed Amount
+                        </SelectItem>
+                        <SelectItem value="Free Shipping">
+                          Free Shipping
+                        </SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -94,9 +241,13 @@ export default function PromotionsPage() {
                     </label>
                     <input
                       id="value"
-                      type="number"
-                      placeholder="e.g. 20 or 15"
+                      value={formData.value}
+                      onChange={(e) =>
+                        setFormData({ ...formData, value: e.target.value })
+                      }
+                      placeholder="e.g. 20% or $10"
                       className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base md:text-sm"
+                      required
                     />
                   </div>
                 </div>
@@ -106,7 +257,15 @@ export default function PromotionsPage() {
                     <div className="relative">
                       <input
                         type="date"
+                        value={formData.startDate}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            startDate: e.target.value,
+                          })
+                        }
                         className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                        required
                       />
                     </div>
                   </div>
@@ -115,25 +274,25 @@ export default function PromotionsPage() {
                     <div className="relative">
                       <input
                         type="date"
+                        value={formData.endDate}
+                        onChange={(e) =>
+                          setFormData({ ...formData, endDate: e.target.value })
+                        }
                         className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                        required
                       />
                     </div>
                   </div>
                 </div>
-              </div>
-              <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2">
-                <button
-                  onClick={() => setIsModalOpen(false)}
-                  className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2"
-                >
-                  Save Promotion
-                </button>
-              </div>
+                <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2">
+                  <Button type="submit">
+                    {editingPromotion ? "Update Promotion" : "Save Promotion"}
+                  </Button>
+                </div>
+              </form>
             </div>
           </div>
         )}
-
-        <PromotionTable columns={columns} data={promotions} />
 
         <PromotionTable columns={columns} data={promotions} />
       </div>

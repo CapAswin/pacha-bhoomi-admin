@@ -1,9 +1,24 @@
 "use client";
 import type { ColumnDef } from "@tanstack/react-table";
-import { ArrowUpDown } from "lucide-react";
+import { ArrowUpDown, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 import type { Promotion } from "@/lib/types";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
-export const columns: ColumnDef<Promotion>[] = [
+interface PromotionTableColumnsProps {
+  onEdit?: (promotion: Promotion) => void;
+  onDelete?: (promotion: Promotion) => void;
+}
+
+export const createColumns = ({
+  onEdit,
+  onDelete,
+}: PromotionTableColumnsProps): ColumnDef<Promotion>[] => [
   {
     accessorKey: "code",
     header: ({ column }) => (
@@ -66,4 +81,37 @@ export const columns: ColumnDef<Promotion>[] = [
       return <div>{date}</div>;
     },
   },
+  {
+    id: "actions",
+    header: "Actions",
+    cell: ({ row }) => {
+      const promotion = row.original;
+
+      return (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="h-8 w-8 p-0">
+              <span className="sr-only">Open menu</span>
+              <MoreHorizontal className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={() => onEdit?.(promotion)}>
+              <Pencil className="mr-2 h-4 w-4" />
+              Edit
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => onDelete?.(promotion)}
+              className="text-destructive"
+            >
+              <Trash2 className="mr-2 h-4 w-4" />
+              Delete
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      );
+    },
+  },
 ];
+
+export const columns = createColumns({});
