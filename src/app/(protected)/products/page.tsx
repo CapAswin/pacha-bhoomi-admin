@@ -9,6 +9,8 @@ import { ProductFormValues } from "@/components/admin/products/product-form";
 import { CreateProductModal } from "@/components/admin/products/create-product-modal";
 import { ProductDeleteModal } from "@/components/admin/products/product-delete-modal";
 import { SelectField } from "@/components/ui/select-field";
+import { Button } from "@/components/ui/button";
+import { useModal } from "@/context/modal-context";
 
 async function fetchProducts(categoryId?: string): Promise<Product[]> {
   const url =
@@ -60,6 +62,7 @@ export default function ProductsPage() {
   const queryClient = useQueryClient();
   const [selectedCategoryId, setSelectedCategoryId] =
     React.useState<string>("all");
+  const { openModal } = useModal();
 
   const {
     data: productList = [],
@@ -136,21 +139,19 @@ export default function ProductsPage() {
 
   return (
     <>
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-headline font-bold animate-slide-in-up">
-          Products
-        </h1>
-      </div>
       <div className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6 bg-background overflow-auto">
         <CreateProductModal onSave={handleAddProduct} />
         <ProductDeleteModal onDelete={handleDeleteProduct} />
-        <div className="flex items-center justify-between space-y-2">
+        <div className="flex items-center justify-between">
           <div>
             <h2 className="text-2xl font-bold tracking-tight">Products</h2>
             <p className="text-muted-foreground">
               Here&apos;s a list of your products.
             </p>
           </div>
+          <Button onClick={() => openModal("createProduct")}>
+            Create Product
+          </Button>
         </div>
         <div className="w-full max-w-sm">
           <SelectField

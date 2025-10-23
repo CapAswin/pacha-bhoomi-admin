@@ -52,11 +52,6 @@ export function ProductTable<TData extends { id: string }, TValue>({
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-end">
-        <Button onClick={() => openModal("createProduct")}>
-          Create Product
-        </Button>
-      </div>
       <div className="rounded-md border">
         <Table>
           <TableHeader>
