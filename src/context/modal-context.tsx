@@ -15,6 +15,7 @@ export type ModalType =
       type: "confirmDeleteCategories";
       data: { categories: Category[]; count: number };
     }
+  | { type: "createPromotion" }
   | null;
 
 type ModalTypeNonNull = Exclude<ModalType, null>;

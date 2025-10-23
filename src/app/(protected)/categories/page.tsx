@@ -119,11 +119,6 @@ export default function CategoriesPage() {
 
   return (
     <>
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-headline font-bold animate-slide-in-up">
-          Categories
-        </h1>
-      </div>
       <div className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6 bg-background overflow-auto">
         <CategoryModal onCreate={handleCreate} onEdit={handleEdit} />
         <CategoryDeleteModal onDelete={handleDelete} />
