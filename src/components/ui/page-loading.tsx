@@ -24,10 +24,8 @@ export function PageLoading({
   if (type === "dashboard") {
     return (
       <div className="flex flex-1 flex-col gap-4 md:gap-8">
-        {/* Dashboard Title */}
         <Skeleton className="h-9 w-48" />
 
-        {/* Stats Cards */}
         <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">
           {Array.from({ length: 4 }).map((_, i) => (
             <div key={i} className="rounded-lg border bg-card p-6 shadow-sm">
@@ -43,9 +41,7 @@ export function PageLoading({
           ))}
         </div>
 
-        {/* Charts and Recent Orders */}
         <div className="grid gap-4 md:gap-8 lg:grid-cols-2 xl:grid-cols-3">
-          {/* Sales Chart */}
           <div className="xl:col-span-2">
             <div className="rounded-lg border bg-card p-6 shadow-sm">
               <div className="space-y-4">
@@ -58,7 +54,6 @@ export function PageLoading({
             </div>
           </div>
 
-          {/* Recent Orders */}
           <div className="rounded-lg border bg-card shadow-sm">
             <div className="p-6 space-y-4">
               <div className="space-y-2">

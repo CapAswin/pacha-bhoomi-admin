@@ -13,18 +13,15 @@ export default function DashboardLayout({ children }: PropsWithChildren) {
   const [isPageLoading, setIsPageLoading] = useState(true);
 
   useEffect(() => {
-    // Show loading when navigating to a new page
     setIsPageLoading(true);
 
-    // Simulate page loading time - increased to make it more visible
     const timer = setTimeout(() => {
       setIsPageLoading(false);
-    }, 800); // Increased from 300ms to 800ms
+    }, 800);
 
     return () => clearTimeout(timer);
   }, [pathname]);
 
-  // Determine loading type based on pathname
   const getLoadingType = () => {
     if (pathname === "/dashboard") return "dashboard";
     if (
