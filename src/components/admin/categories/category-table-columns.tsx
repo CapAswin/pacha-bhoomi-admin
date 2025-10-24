@@ -3,28 +3,25 @@ import type { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown } from "lucide-react";
 import type { Category } from "@/lib/types";
 import { CategoryActions } from "@/components/admin/categories/category-actions";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export const columns: ColumnDef<Category>[] = [
   {
     id: "select",
     header: ({ table }) => (
-      <input
-        type="checkbox"
-        checked={table.getIsAllPageRowsSelected()}
-        onChange={(e) => table.toggleAllPageRowsSelected(!!e.target.checked)}
+      <Checkbox
+        checked={
+          table.getIsAllPageRowsSelected() ||
+          (table.getIsSomePageRowsSelected() && "indeterminate")
+        }
+        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
         aria-label="Select all"
-        ref={(el) => {
-          if (el) {
-            el.indeterminate = table.getIsSomePageRowsSelected();
-          }
-        }}
       />
     ),
     cell: ({ row }) => (
-      <input
-        type="checkbox"
+      <Checkbox
         checked={row.getIsSelected()}
-        onChange={(e) => row.toggleSelected(!!e.target.checked)}
+        onCheckedChange={(value) => row.toggleSelected(!!value)}
         aria-label="Select row"
       />
     ),
