@@ -1,11 +1,18 @@
 "use client";
 import type { ColumnDef } from "@tanstack/react-table";
-import { ArrowUpDown } from "lucide-react";
+import { ArrowUpDown, Trash2 } from "lucide-react";
 import type { Product } from "@/lib/types";
 import { ProductActions } from "./product-actions";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@/components/ui/button";
 
-export const columns: ColumnDef<Product>[] = [
+interface ProductTableColumnsProps {
+  onBulkDelete?: (ids: string[]) => void;
+}
+
+export const createColumns = ({
+  onBulkDelete,
+}: ProductTableColumnsProps): ColumnDef<Product>[] => [
   {
     id: "select",
     header: ({ table }) => (
@@ -111,9 +118,12 @@ export const columns: ColumnDef<Product>[] = [
   },
   {
     id: "actions",
+    header: "Actions",
     cell: ({ row }) => {
       const product = row.original;
       return <ProductActions product={product} />;
     },
   },
 ];
+
+export const columns = createColumns({});

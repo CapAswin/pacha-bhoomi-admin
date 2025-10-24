@@ -3,7 +3,7 @@ import React from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Product, Category } from "@/lib/types";
 import { ProductTable } from "@/components/admin/products/product-table";
-import { columns } from "@/components/admin/products/product-table-columns";
+import { createColumns } from "@/components/admin/products/product-table-columns";
 import { ProductTableSkeleton } from "@/components/admin/products/product-table-skeleton";
 import { ProductFormValues } from "@/components/admin/products/product-form";
 import { CreateProductModal } from "@/components/admin/products/create-product-modal";
@@ -135,6 +135,15 @@ async function deleteProduct(productId: string): Promise<void> {
   if (!response.ok) throw new Error("Failed to delete product");
 }
 
+async function bulkDeleteProducts(ids: string[]): Promise<void> {
+  const response = await fetch("/api/products/bulk-delete", {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ ids }),
+  });
+  if (!response.ok) throw new Error("Failed to delete products");
+}
+
 export default function ProductsPage() {
   const queryClient = useQueryClient();
   const [selectedCategoryId, setSelectedCategoryId] =
@@ -207,6 +216,17 @@ export default function ProductsPage() {
     },
   });
 
+  const bulkDeleteMutation = useMutation({
+    mutationFn: bulkDeleteProducts,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+      showToast.success("Products deleted successfully!");
+    },
+    onError: () => {
+      showToast.error("Failed to delete products. Please try again.");
+    },
+  });
+
   const handleAddProduct = async (
     productData: ProductFormValues,
     pendingFiles?: (File | null)[],
@@ -232,6 +252,14 @@ export default function ProductsPage() {
     await deleteMutation.mutateAsync(productId);
   };
 
+  const handleBulkDeleteProducts = async (ids: string[]) => {
+    await bulkDeleteMutation.mutateAsync(ids);
+  };
+
+  const columns = createColumns({
+    onBulkDelete: handleBulkDeleteProducts,
+  });
+
   const categoryOptions = [
     { id: "all", name: "All Categories" },
     ...categoryList,
@@ -241,7 +269,7 @@ export default function ProductsPage() {
     <>
       <div className="flex flex-1 flex-col gap-2 p-2 lg:gap-4 lg:p-4 bg-background overflow-auto">
         <CreateProductModal onSave={handleAddProduct} />
-        <ProductDeleteModal onDelete={handleDeleteProduct} />
+        <ProductDeleteModal onDelete={handleBulkDeleteProducts} />
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-2xl font-bold tracking-tight">Products</h2>

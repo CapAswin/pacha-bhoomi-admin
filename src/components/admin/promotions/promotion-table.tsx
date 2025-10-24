@@ -19,6 +19,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import { useModal } from "@/context/modal-context";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -29,6 +31,7 @@ export function PromotionTable<TData extends { id: string }, TValue>({
   columns,
   data,
 }: DataTableProps<TData, TValue>) {
+  const { openModal } = useModal();
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [rowSelection, setRowSelection] = React.useState({});
 
@@ -47,8 +50,32 @@ export function PromotionTable<TData extends { id: string }, TValue>({
     getRowId: (row) => (row as TData).id,
   });
 
+  const selectedRows = table.getFilteredSelectedRowModel().rows;
+  const hasSelectedRows = selectedRows.length > 0;
+
   return (
     <div className="space-y-4">
+      {hasSelectedRows && (
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-muted-foreground">
+            {selectedRows.length} selected
+          </span>
+          <Button
+            variant="destructive"
+            size="sm"
+            onClick={() => {
+              // Use modal instead of direct delete
+              openModal("confirmDeletePromotions", {
+                promotions: selectedRows.map((row) => row.original),
+                count: selectedRows.length,
+              });
+              table.resetRowSelection();
+            }}
+          >
+            Delete Selected
+          </Button>
+        </div>
+      )}
       <div className="rounded-md border">
         <Table>
           <TableHeader>

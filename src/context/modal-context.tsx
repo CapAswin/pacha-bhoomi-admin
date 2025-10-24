@@ -8,6 +8,10 @@ export type ModalType =
   | { type: "createProduct"; data?: Product }
   | { type: "editProduct"; data: { product: Product } }
   | { type: "confirmDeleteProduct"; data: { product: Product } }
+  | {
+      type: "confirmDeleteProducts";
+      data: { products: Product[]; count: number };
+    }
   | { type: "createCategory"; data?: Category }
   | { type: "editCategory"; data: { category: Category } }
   | { type: "confirmDeleteCategory"; data: { category: Category } }
@@ -16,6 +20,10 @@ export type ModalType =
       data: { categories: Category[]; count: number };
     }
   | { type: "createPromotion" }
+  | {
+      type: "confirmDeletePromotions";
+      data: { promotions: any[]; count: number };
+    }
   | null;
 
 type ModalTypeNonNull = Exclude<ModalType, null>;
