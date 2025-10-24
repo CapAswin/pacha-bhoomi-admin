@@ -15,7 +15,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import type { Promotion } from "@/lib/types";
 import { showToast } from "@/lib/toast";
-import { PromotionDeleteModal } from "@/components/admin/promotions/promotion-delete-modal";
+import { DeleteModal } from "@/components/admin/products/product-delete-modal";
 
 export default function PromotionsPage() {
   const [promotions, setPromotions] = React.useState<Promotion[]>([]);
@@ -346,7 +346,11 @@ export default function PromotionsPage() {
           </div>
         )}
 
-        <PromotionDeleteModal onDelete={handleBulkDelete} />
+        <DeleteModal
+          onDelete={handleBulkDelete}
+          entityName="Promotion"
+          entityNamePlural="Promotions"
+        />
         <PromotionTable columns={columns} data={promotions} />
       </div>
     </>

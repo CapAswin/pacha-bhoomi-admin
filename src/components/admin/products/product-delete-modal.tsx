@@ -10,53 +10,62 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Product } from "@/lib/types";
 
-interface ProductDeleteModalProps {
+interface DeleteModalProps {
   onDelete: (ids: string[]) => void;
+  entityName: string;
+  entityNamePlural: string;
 }
 
-export function ProductDeleteModal({ onDelete }: ProductDeleteModalProps) {
+export function DeleteModal({
+  onDelete,
+  entityName,
+  entityNamePlural,
+}: DeleteModalProps) {
   const { modal, closeModal } = useModal();
 
   if (
-    modal?.type !== "confirmDeleteProduct" &&
-    modal?.type !== "confirmDeleteProducts"
+    modal?.type !== `confirmDelete${entityName}` &&
+    modal?.type !== `confirmDelete${entityNamePlural}`
   ) {
     return null;
   }
 
-  const isBulkDelete = modal.type === "confirmDeleteProducts";
-  const { product, products, count } = modal.data as {
-    product?: Product;
-    products?: Product[];
-    count?: number;
+  const isBulkDelete = modal.type === `confirmDelete${entityNamePlural}`;
+  const {
+    [entityName.toLowerCase()]: singleItem,
+    [entityNamePlural.toLowerCase()]: items,
+    count,
+  } = (modal as any).data as {
+    [key: string]: any;
   };
 
   const handleConfirm = () => {
-    if (isBulkDelete && products) {
-      const ids = products.map((prod) => prod.id);
+    if (isBulkDelete && items) {
+      const ids = items.map((item: any) => item.id);
       onDelete(ids);
-    } else if (product) {
-      onDelete([product.id]);
+    } else if (singleItem) {
+      onDelete([singleItem.id]);
     }
     closeModal();
   };
 
   const title = isBulkDelete
-    ? "Delete Multiple Products"
+    ? `Delete Multiple ${entityNamePlural}`
     : "Are you absolutely sure?";
   const description = isBulkDelete
     ? `This action cannot be undone. This will permanently delete ${
-        count || products?.length
-      } selected products.`
-    : `This action cannot be undone. This will permanently delete the product "${product?.name}".`;
+        count || items?.length
+      } selected ${entityNamePlural.toLowerCase()}.`
+    : `This action cannot be undone. This will permanently delete the ${entityName.toLowerCase()} "${
+        singleItem?.name || singleItem?.code
+      }".`;
 
   return (
     <Dialog
       open={
-        modal.type === "confirmDeleteProduct" ||
-        modal.type === "confirmDeleteProducts"
+        modal.type === `confirmDelete${entityName}` ||
+        modal.type === `confirmDelete${entityNamePlural}`
       }
       onOpenChange={closeModal}
     >

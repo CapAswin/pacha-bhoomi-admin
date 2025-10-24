@@ -7,7 +7,7 @@ import { createColumns } from "@/components/admin/products/product-table-columns
 import { ProductTableSkeleton } from "@/components/admin/products/product-table-skeleton";
 import { ProductFormValues } from "@/components/admin/products/product-form";
 import { CreateProductModal } from "@/components/admin/products/create-product-modal";
-import { ProductDeleteModal } from "@/components/admin/products/product-delete-modal";
+import { DeleteModal } from "@/components/admin/products/product-delete-modal";
 import { SelectField } from "@/components/ui/select-field";
 import { Button } from "@/components/ui/button";
 import { useModal } from "@/context/modal-context";
@@ -269,7 +269,11 @@ export default function ProductsPage() {
     <>
       <div className="flex flex-1 flex-col gap-2 p-2 lg:gap-4 lg:p-4 bg-background overflow-auto">
         <CreateProductModal onSave={handleAddProduct} />
-        <ProductDeleteModal onDelete={handleBulkDeleteProducts} />
+        <DeleteModal
+          onDelete={handleBulkDeleteProducts}
+          entityName="Product"
+          entityNamePlural="Products"
+        />
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-2xl font-bold tracking-tight">Products</h2>
