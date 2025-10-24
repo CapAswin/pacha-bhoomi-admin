@@ -50,17 +50,20 @@ export async function PUT(
     const db = await getDb();
     const promotionData = await request.json();
 
+    const updateData = {
+      code: promotionData.code,
+      type: promotionData.type,
+      value: promotionData.value,
+      status: promotionData.status,
+      startDate: promotionData.startDate,
+      endDate: promotionData.endDate,
+      modifiedAt: new Date().toISOString(),
+    };
+
     const result = await db.collection("promotions").updateOne(
       { _id: new ObjectId(resolvedParams.id) },
       {
-        $set: {
-          code: promotionData.code,
-          type: promotionData.type,
-          value: promotionData.value,
-          status: promotionData.status,
-          startDate: promotionData.startDate,
-          endDate: promotionData.endDate,
-        },
+        $set: updateData,
       }
     );
 
@@ -68,7 +71,24 @@ export async function PUT(
       return new NextResponse("Promotion not found", { status: 404 });
     }
 
-    return NextResponse.json({ success: true }, { status: 200 });
+    // Return the updated promotion data
+    const updatedPromotion = await db.collection("promotions").findOne({
+      _id: new ObjectId(resolvedParams.id),
+    });
+
+    if (!updatedPromotion) {
+      return new NextResponse("Promotion not found after update", {
+        status: 404,
+      });
+    }
+
+    const formattedPromotion = {
+      ...updatedPromotion,
+      id: updatedPromotion._id.toString(),
+      _id: undefined,
+    };
+
+    return NextResponse.json(formattedPromotion, { status: 200 });
   } catch (error) {
     console.error("Failed to update promotion:", error);
     return NextResponse.json(

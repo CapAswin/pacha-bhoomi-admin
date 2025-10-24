@@ -12,6 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
 import type { Promotion } from "@/lib/types";
 import { showToast } from "@/lib/toast";
 
@@ -95,6 +96,32 @@ export default function PromotionsPage() {
     }
   };
 
+  const handleBulkDelete = async (ids: string[]) => {
+    if (!confirm(`Are you sure you want to delete ${ids.length} promotions?`)) {
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/promotions/bulk-delete", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ ids }),
+      });
+
+      if (response.ok) {
+        setPromotions(promotions.filter((p) => !ids.includes(p.id)));
+        showToast.success(`${ids.length} promotions deleted successfully!`);
+      } else {
+        showToast.error("Failed to delete promotions. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error deleting promotions:", error);
+      showToast.error("Failed to delete promotions. Please try again.");
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -143,6 +170,7 @@ export default function PromotionsPage() {
   const columns = createColumns({
     onEdit: handleEditPromotion,
     onDelete: handleDeletePromotion,
+    onBulkDelete: handleBulkDelete,
   });
 
   if (loading) {
@@ -152,6 +180,26 @@ export default function PromotionsPage() {
           <div>
             <h2 className="text-2xl font-bold tracking-tight">Promotions</h2>
             <p className="text-muted-foreground">Loading promotions...</p>
+          </div>
+          <Skeleton className="h-10 w-32" />
+        </div>
+
+        <div className="rounded-md border">
+          <div className="p-4">
+            <div className="space-y-4">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <div key={i} className="flex items-center space-x-4">
+                  <Skeleton className="h-4 w-4" />
+                  <Skeleton className="h-4 w-24" />
+                  <Skeleton className="h-4 w-20" />
+                  <Skeleton className="h-4 w-16" />
+                  <Skeleton className="h-4 w-16" />
+                  <Skeleton className="h-4 w-20" />
+                  <Skeleton className="h-4 w-20" />
+                  <Skeleton className="h-8 w-8" />
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
