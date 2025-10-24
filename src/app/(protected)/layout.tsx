@@ -37,16 +37,18 @@ export default function DashboardLayout({ children }: PropsWithChildren) {
 
   return (
     <Providers>
-      <div className="flex min-h-screen w-full">
+      <div className="flex h-screen w-full overflow-hidden">
         <SidebarNav />
-        <div className="flex flex-col flex-1">
+        <div className="flex flex-col flex-1 overflow-hidden">
           <Header />
-          <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6 bg-background">
-            {isPageLoading ? (
-              <PageLoading type={getLoadingType()} showSpinner={true} />
-            ) : (
-              children
-            )}
+          <main className="flex-1 overflow-auto bg-background">
+            <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
+              {isPageLoading ? (
+                <PageLoading type={getLoadingType()} showSpinner={true} />
+              ) : (
+                children
+              )}
+            </div>
           </main>
         </div>
       </div>
