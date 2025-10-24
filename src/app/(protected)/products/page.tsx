@@ -11,6 +11,7 @@ import { ProductDeleteModal } from "@/components/admin/products/product-delete-m
 import { SelectField } from "@/components/ui/select-field";
 import { Button } from "@/components/ui/button";
 import { useModal } from "@/context/modal-context";
+import { showToast } from "@/lib/toast";
 
 async function fetchProducts(categoryId?: string): Promise<Product[]> {
   const url =
@@ -175,17 +176,35 @@ export default function ProductsPage() {
       productData: ProductFormValues;
       pendingFiles?: (File | null)[];
     }) => addProduct(productData, pendingFiles),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["products"] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+      showToast.success("Product added successfully!");
+    },
+    onError: () => {
+      showToast.error("Failed to add product. Please try again.");
+    },
   });
 
   const editMutation = useMutation({
     mutationFn: editProduct,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["products"] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+      showToast.success("Product updated successfully!");
+    },
+    onError: () => {
+      showToast.error("Failed to update product. Please try again.");
+    },
   });
 
   const deleteMutation = useMutation({
     mutationFn: deleteProduct,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["products"] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+      showToast.success("Product deleted successfully!");
+    },
+    onError: () => {
+      showToast.error("Failed to delete product. Please try again.");
+    },
   });
 
   const handleAddProduct = async (

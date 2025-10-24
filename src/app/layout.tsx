@@ -4,6 +4,7 @@ import { FirebaseClientProvider } from "@/firebase";
 import "./globals.css";
 import ClientSessionProvider from "./session-provider";
 import { ModalProvider } from "@/context/modal-context";
+import { Toast } from "@/components/ui/toast";
 
 export const metadata: Metadata = {
   title: "Pacha Bhoomi Admin",
@@ -40,6 +41,7 @@ export default function RootLayout({
             <FirebaseClientProvider>
               <ModalProvider>
                 {children}
+                <Toast />
               </ModalProvider>
             </FirebaseClientProvider>
           </ClientSessionProvider>

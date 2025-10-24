@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { useModal } from "@/context/modal-context";
 import { CategoryModal } from "@/components/admin/categories/category-modal";
 import { CategoryDeleteModal } from "@/components/admin/categories/category-delete-modal";
+import { showToast } from "@/lib/toast";
 
 async function getCategories(): Promise<Category[]> {
   const response = await fetch("/api/categories");
@@ -86,8 +87,10 @@ export default function CategoriesPage() {
         return dateB - dateA;
       });
       setCategories(updatedCategories);
+      showToast.success("Category created successfully!");
     } catch (error) {
       console.error(error);
+      showToast.error("Failed to create category. Please try again.");
     }
   };
 
@@ -102,8 +105,10 @@ export default function CategoriesPage() {
         return dateB - dateA;
       });
       setCategories(sortedData);
+      showToast.success("Category updated successfully!");
     } catch (error) {
       console.error(error);
+      showToast.error("Failed to update category. Please try again.");
     }
   };
 
@@ -112,8 +117,10 @@ export default function CategoriesPage() {
       await deleteCategory(ids);
       const idArray = ids.split(",");
       setCategories(categories.filter((c) => !idArray.includes(c.id)));
+      showToast.success("Category deleted successfully!");
     } catch (error) {
       console.error(error);
+      showToast.error("Failed to delete category. Please try again.");
     }
   };
 

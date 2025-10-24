@@ -13,6 +13,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import type { Promotion } from "@/lib/types";
+import { showToast } from "@/lib/toast";
 
 export default function PromotionsPage() {
   const [promotions, setPromotions] = React.useState<Promotion[]>([]);
@@ -84,12 +85,13 @@ export default function PromotionsPage() {
 
       if (response.ok) {
         setPromotions(promotions.filter((p) => p.id !== promotion.id));
+        showToast.success("Promotion deleted successfully!");
       } else {
-        alert("Failed to delete promotion");
+        showToast.error("Failed to delete promotion. Please try again.");
       }
     } catch (error) {
       console.error("Error deleting promotion:", error);
-      alert("Error deleting promotion");
+      showToast.error("Failed to delete promotion. Please try again.");
     }
   };
 
@@ -123,16 +125,18 @@ export default function PromotionsPage() {
               p.id === editingPromotion.id ? savedPromotion : p
             )
           );
+          showToast.success("Promotion updated successfully!");
         } else {
           setPromotions([...promotions, savedPromotion]);
+          showToast.success("Promotion created successfully!");
         }
         setIsModalOpen(false);
       } else {
-        alert("Failed to save promotion");
+        showToast.error("Failed to save promotion. Please try again.");
       }
     } catch (error) {
       console.error("Error saving promotion:", error);
-      alert("Error saving promotion");
+      showToast.error("Failed to save promotion. Please try again.");
     }
   };
 
@@ -213,7 +217,7 @@ export default function PromotionsPage() {
                       Type
                     </label>
                     <Select
-                      value={formData.type}
+                      defaultValue={formData.type}
                       onValueChange={(value) =>
                         setFormData({ ...formData, type: value })
                       }
