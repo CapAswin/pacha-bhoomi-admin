@@ -42,7 +42,7 @@ export default function DashboardLayout({ children }: PropsWithChildren) {
         <div className="flex flex-col flex-1 overflow-hidden">
           <Header />
           <main className="flex-1 overflow-auto bg-background">
-            <div className="flex flex-col gap-4 p-4 lg:gap-6 lg:p-6">
+            <div className="flex flex-col gap-2 p-2 lg:gap-4 lg:p-4">
               {isPageLoading ? (
                 <PageLoading type={getLoadingType()} showSpinner={true} />
               ) : (

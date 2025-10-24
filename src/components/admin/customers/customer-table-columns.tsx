@@ -4,6 +4,7 @@ import { useState } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal, ArrowUpDown } from "lucide-react";
 import type { Customer } from "@/lib/types";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export const columns = (
   onResetPassword: (email: string) => void
@@ -11,29 +12,19 @@ export const columns = (
   {
     id: "select",
     header: ({ table }) => (
-      <input
-        type="checkbox"
-        className="h-4 w-4 shrink-0 rounded-sm border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground"
-        checked={table.getIsAllPageRowsSelected()}
-        ref={(input) => {
-          if (input) {
-            input.indeterminate =
-              table.getIsSomePageRowsSelected() &&
-              !table.getIsAllPageRowsSelected();
-          }
-        }}
-        onChange={(value) =>
-          table.toggleAllPageRowsSelected(!!value.target.checked)
+      <Checkbox
+        checked={
+          table.getIsAllPageRowsSelected() ||
+          (table.getIsSomePageRowsSelected() && "indeterminate")
         }
+        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
         aria-label="Select all"
       />
     ),
     cell: ({ row }) => (
-      <input
-        type="checkbox"
-        className="h-4 w-4 shrink-0 rounded-sm border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground"
+      <Checkbox
         checked={row.getIsSelected()}
-        onChange={(value) => row.toggleSelected(!!value.target.checked)}
+        onCheckedChange={(value) => row.toggleSelected(!!value)}
         aria-label="Select row"
       />
     ),

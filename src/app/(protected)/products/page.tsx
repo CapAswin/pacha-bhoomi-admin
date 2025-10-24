@@ -239,7 +239,7 @@ export default function ProductsPage() {
 
   return (
     <>
-      <div className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6 bg-background overflow-auto">
+      <div className="flex flex-1 flex-col gap-2 p-2 lg:gap-4 lg:p-4 bg-background overflow-auto">
         <CreateProductModal onSave={handleAddProduct} />
         <ProductDeleteModal onDelete={handleDeleteProduct} />
         <div className="flex items-center justify-between">

@@ -83,7 +83,7 @@ export function PageLoading({
 
   if (type === "table") {
     return (
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-2">
         <div className="flex items-center justify-between">
           <div>
             <Skeleton className="h-8 w-48 mb-2" />
@@ -93,8 +93,8 @@ export function PageLoading({
         </div>
 
         <div className="rounded-md border">
-          <div className="p-4">
-            <div className="space-y-4">
+          <div className="p-2">
+            <div className="space-y-2">
               {Array.from({ length: 5 }).map((_, i) => (
                 <div key={i} className="flex items-center space-x-4">
                   <Skeleton className="h-4 w-4" />

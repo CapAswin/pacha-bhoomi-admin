@@ -6,7 +6,7 @@ export default function SettingsPage() {
       <h1 className="text-3xl font-headline font-bold animate-slide-in-up">
         Settings
       </h1>
-      <div className="grid gap-8">
+      <div className="grid gap-4">
         <div
           className="border rounded-lg bg-card text-card-foreground shadow-sm glassmorphism animate-slide-in-up"
           style={{ animationDelay: "200ms" }}
